@@ -1,0 +1,2031 @@
+MTK MOLY MakeBuild Design Customer
+Version: MEDIATEK CONFIDENTIALValid for WR8.W1231.DC.WG.MP and later release
+Release date: 2015-08-21
+. 2008-2012 MediaTek Inc.
+This document contains information that is proprietary to MediaTek Inc.
+Unauthorized reproduction or disclosure of this information in whole or in part is strictly prohibited.
+MOLY Make/Build Environment
+Procedures Design DocumentFOR yuqing.zhang@ ck-telecom.com USE ONLY
+Version: MEDIATEK CONFIDENTIALValid for WR8.W1231.DC.WG.MP and later release
+Release date: 2015-08-21
+. 2008-2012 MediaTek Inc.
+This document contains information that is proprietary to MediaTek Inc.
+Unauthorized reproduction or disclosure of this information in whole or in part is strictly prohibited.
+MOLY Make/Build Environment
+Procedures Design DocumentFOR yuqing.zhang@ ck-telecom.com USE ONLY
+
+and
+
+Specifications are subject to change without notice.
+
+MOLY Make/Build Environment
+and Procedures Design Document
+MOLY Make/Build Environment
+and Procedures Design Document
+r
+
+ 
+
+BY OPENING THIS FILE, RECEIVER HEREBY UNEQUIVOCALLY ACKNOWLEDGES AND
+AGREES THAT THE SOFTWARE/FIRMWARE AND ITS DOCUMENTATIONS (“MEDIATEK
+SOFTWARE”) RECEIVED FROM MEDIATEK AND/OR ITS REPRESENTATIVES ARE PROVIDED
+TO RECEIVER ON AN “AS-IS” BASIS ONLY.
+
+MEDIATEK EXPRESSLY DISCLAIMS ANY AND ALL WARRANTIES, EXPRESS OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE OR NONINFRINGEMENT.
+
+NEITHER DOES MEDIATEK PROVIDE ANY WARRANTY WHATSOEVER WITH RESPECT TO THE
+SOFTWARE OF ANY THIRD PARTY WHICH MAY BE USED BY, INCORPORATED IN, OR
+SUPPLIED WITH THE MEDIATEK SOFTWARE, AND RECEIVER AGREES TO LOOK ONLY TO
+SUCH THIRD PARTY FOR ANY WARRANTY CLAIM RELATING THERETO.
+
+RECEIVER EXPRESSLY ACKNOWLEDGES THAT IT IS RECEIVER’S SOLE RESPONSIBILITY TO
+OBTAIN FROM ANY THIRD PARTY ALL PROPER LICENSES CONTAINED IN MEDIATEK
+SOFTWARE. MEDIATEK SHALL ALSO NOT BE RESPONSIBLE FOR ANY MEDIATEK SOFTWARE
+RELEASES MADE TO RECEIVER’S SPECIFICATION OR TO CONFORM TO A PARTICULAR
+STANDARD OR OPEN FORUM.
+
+RECEIVER’S SOLE AND EXCLUSIVE REMEDY AND MEDIATEK’S ENTIRE AND CUMULATIVE
+LIABILITY WITH RESPECT TO THE MEDIATEK SOFTWARE RELEASED HEREUNDER WILL
+BE,AT MEDIATEK’S OPTION, TO REVISE OR REPLACE THE MEDIATEK SOFTWARE AT ISSUE,
+OR REFUND ANY SOFTWARE LICENSE FEES OR SERVICE CHARGE PAID BY RECEIVER TO
+MEDIATEK FOR SUCH MEDIATEK SOFTWARE AT ISSUE.
+
+MediaTek Confidential . 2012 -2015 MediaTek Inc. Page 2 of 37
+
+This document contains information that is proprietary to MediaTek Inc.
+Unauthorized reproduction or disclosure of this information in whole or in part is strictly prohibited.
+
+ 
+
+MOLY Make/Build Environment
+and Procedures Design Document
+MOLY Make/Build Environment
+and Procedures Design Document
+s
+
+ 
+
+Legal Disclaimer…………………………………………………………………………………………………………………….2
+Table of Contents…………………………………………………………………………………………………………………..3
+1 Introduction…………………………………………………………………………………………………………………..5
+
+ 
+
+1.1 Features………………………………………………………………………………………………………………..5
+1.2 References ……………………………………………………………………………………………………………5
+1.3 Terminology and Definition………………………………………………………………………………………5
+2 Environment Requirements and Limitations…………………………………………………………………..6
+
+ 
+
+2.1 Environment Requirements ……………………………………………………………………………………..6
+2.2 Environment Limitations………………………………………………………………………………………….6
+3 File Architecture and Directories……………………………………………………………………………………7
+
+ 
+
+3.1 Directory Architecture……………………………………………………………………………………………..7
+3.1.1 Root Directory …………………………………………………………………………………………7
+3.1.2 Make/Build Script Directory……………………………………………………………………….8
+3.2 Build Scripts…………………………………………………………………………………………………………..9
+3.3 Module Configuration Files…………………………………………………………………………………….11
+3.4 Intermediate Build Scripts and Log File……………………………………………………………………13
+3.5 Generated Objects, Libraries, Executable Binary and Log Files………………………………….14
+3.6 Associated Perl Files …………………………………………………………………………………………….16
+4 Procedures and Functionality………………………………………………………………………………………18
+5 Description of Options…………………………………………………………………………………………………22
+
+ 
+
+5.1 Core Software………………………………………………………………………………………………………22
+6 Design and Implementation …………………………………………………………………………………………23
+
+ 
+
+6.1 make.sh, m and make.pl –
+Main Build Script File ……………………………………………………..23
+6.2
+build.mak/Codegen.mak –
+Main Build Script…………………………………………………………….23
+6.3
+Comp.mak –
+Component Module Build Script ………………………………………………………….29
+6.4
+Option.mak/Option_HAL.mak/MODEM.mak –
+Project common option, and macro
+definition Build Script…………………………………………………………………………………………….31
+6.5
+USER_SPECIFIC.mak –
+debug modules configuration script…………………………………….32
+7 How to Customize the Build Environment…………………………………………………………………….33
+
+ 
+
+7.1 Add Modules to or Remove Modules from the Build Procedure ………………………………….33
+7.1.1 Add a Source Module……………………………………………………………………………..33
+7.1.2 Remove a Source Module……………………………………………………………………….34
+7.1.3 Move a Source Module to a .lib Module…………………………………………………….34
+Appendix1 Install Software and Compilation Tool Chain…………………………………………………..35
+1 Install build relative packages ……………………………………………………………………………………..36
+2 Install arm-none-eabi-gcc-4.6.2 ……………………………………………………………………………………37
+
+ 
+
+2.1 arm-none-eabi-gcc-4.6.2 Web Site………………………………………………………………………….37
+2.2 MinGW Installation Procedure………………………………………………………………………………..37
+MediaTek Confidential . 2012 -2015 MediaTek Inc.
+Page 3 of 37
+
+This document contains information that is proprietary to MediaTek Inc.
+Unauthorized reproduction or disclosure of this information in whole or in part is strictly prohibited.
+
+ 
+
+MOLY
+FOR yuqing.zhang@ ck-telecom.com USE ONLYMake/Build Environment
+and Procedures Design Document
+MOLY
+FOR yuqing.zhang@ ck-telecom.com USE ONLYMake/Build Environment
+and Procedures Design Document
+s
+
+ 
+
+Table 1: Core Software Options………………………………………………………………………………………………22
+Figure 1: Architecture of MOLY Make/Build Script……………………………………………………………………….9
+
+ 
+
+MediaTek Confidential . 2012 -2015 MediaTek Inc. Page 4 of 37
+
+This document contains information that is proprietary to MediaTek Inc.
+Unauthorized reproduction or disclosure of this information in whole or in part is strictly prohibited.
+
+ 
+
+Terminology Terminology
+Action Behaviors that can be executed by the build script.
+Clean Ability to clean generated objects, libraries, and logs.
+Component/Module A project decomposition unit which can be created as a library.
+Customer The customers who get the released software.
+New, Update, Remake Ability to build all or rebuild only modified files based on generated
+dependencies.
+Project Combination of independent sources, header files, and created image
+binaries, objects, libraries, etc. such as HSPA, GPRS.
+
+MOLY Make/Build Environment
+and Procedures Design Document
+1 Introduction
+
+ 
+
+MOLY make/build environment and procedures utilize GNU make for building project executable
+binaries. The actions include new, update, remake, check_dep, remake_dep, cleanall, cleanmod,
+codegen, emigen, emiclean, sysgen, drv_feature_check, cmmgen, bootloader, genlog, etc.
+Detailed terminology and features are described in the following sections.
+
+1.1 Features
+.
+Ability to easily add or delete files from the build
+.
+Ability to handle include files included in other directories
+.
+Ability to build based on relative paths
+.
+Ability to build different projects which have private source trees.
+.
+Ability to allow modules to specify private options, in addition to public build options.
+.
+Ability to clean dedicated modules or all.
+.
+Ability to debug easily.
+
+ 
+
+1.2 References
+[1] GNU Make Manual, Version 3.81
+1.3 Terminology and Definition
+MediaTek Confidential . 2012 -2015 MediaTek Inc. Page 5 of 37
+This document contains information that is proprietary to MediaTek Inc.
+Unauthorized reproduction or disclosure of this information in whole or in part is strictly prohibited.
+
+ 
+
+Requirement Requirement
+OS It’s necessary for all customers.
+The recommended OS is Linux/Ubuntu 10.04 LTS 64-bit version.
+(do NOT support 32-bit version now)
+Shell It’s necessary for all customers.
+GNU bash shell, version 4.1.5
+Make It’s necessary for all customers.
+GNU Make 3.81
+Compiler It’s necessary for all customers.
+.
+Linaro GNU Tools for ARM Embedded Processors.
+.
+Linaro gcc-arm-none-eabi 4.6-20111208. (v4.6.2)
+It can be downloaded from http://www.linaro.org/downloads/
+Perl
+interpreter
+It’s necessary for all customers.
+.
+Perl
+.
+The recommended version is Perl 5.10.1. If you do not have this built-in
+package on Linux. You can find the related Perl source code from:
+http://www.cpan.org/src/5.0/
+http://www.cpan.org/src/README.html
+Tools should be referred to “Appendix1” which describes the standard procedure
+to install them for MOLY.
+
+MOLY Make/Build Environment
+and Procedures Design Document
+2 Environment Requirements and Limitations
+
+ 
+
+2.1 Environment Requirements
+2.2 Environment Limitations
+.
+Make sure “bash shell” is the default shell on your Linux development environment.
+MediaTek Confidential . 2012 -2015 MediaTek Inc. Page 6 of 37
+
+This document contains information that is proprietary to MediaTek Inc.
+Unauthorized reproduction or disclosure of this information in whole or in part is strictly prohibited.
+
+ 
+
+File / Directory Name File / Directory Name
+make.sh, m, make.pl MOLY project make/build execution bash shell script and Perl script.
+[ build ] Generated object, libraries, executable binary and log files directory.
+The directory will be created automatically. For details, see “Generated
+Objects, Libraries, Executable Binary and Log Files” sections.
+[ custom ] Custom’s task/modules’ sources and header files
+[ driver ] Driver modules source codes directory.
+[ interface ] Driver, middleware, modem and service common included header files
+directory. The file playing a role of an interface between components is
+placed here.
+[ make ] Main build scripts and option file directory.
+[ middleware ] Middleware modules source codes directory.
+[ mtk_rel ] MTK libraries are released here.
+[ modem ] Layer 1, layer 4, gas, tdd128 and other modem files directory..
+[ service ] Service module source codes directory, such as Nucleus Plus RTOS
+source files, nvram source files.
+[ tools ] Miscellaneous tools used in build/make procedures
+
+MOLY Make/Build Environment
+and Procedures Design Document
+3 File Architecture and Directories
+
+ 
+
+3.1 Directory Architecture
+The main architecture of directory is composed of four categories (driver, middleware, modem and service) and
+other common files.
+
+3.1.1 Root Directory
+[mcu/]
+
+make.sh, m
+
+make.pl
+
+[ build ]
+
+[ custom ]
+
+[ driver ]
+
+[ interface ]
+
+[ make ]
+
+[ middleware ]
+
+[ mtk_rel ]
+
+[ modem ]
+
+[ service ]
+
+[ tools ]
+
+…
+
+MediaTek Confidential . 2012 -2015 MediaTek Inc. Page 7 of 37
+This document contains information that is proprietary to MediaTek Inc.
+Unauthorized reproduction or disclosure of this information in whole or in part is strictly prohibited.
+
+ 
+
+File / Directory Name File / Directory Name
+buildConfig.mak Build path, build directory and build flow variable configuration script.
+cmd_cfg.mak Command tools on build flow are configured in this file.
+compiler.mak Compiler tools and compiler flag configuration script.
+Comp.mak Component modules build script.
+Codegen.mak Describe AutoGen flow which automatically generates common files.
+Custom.bld Keep some variables used in custom release. It should not be
+modified.
+build.mak Main make/build script.
+MODEM.mak MODEM related option, and macro definition build script.
+Option.mak Project common option and macro definition build script.
+Project Makefile List different configuration according to customer and project
+requirement
+USER_SPECIFIC.mak debug modules configuration script
+[ module ] Module configuration files describing source file, include path and
+component option for each module are placed here.
+[ rel ] Release Configuration script is placed here.
+[modem_spec] MTK modem specification
+[custom_config] customer project extended configuration (reference only)
+
+MOLY Make/Build Environment
+and Procedures Design Document
+3.1.2 Make/Build Script Directory
+[ mcu/make/ ]
+
+buildConfig.mak
+
+cmd_cfg.mak
+
+compiler.makComp.mak
+
+Codegen.mak
+
+Custom.bld
+
+build.mak
+
+MODEM.mak
+
+Option.mak
+
+Project Makefile (e.g. MT6280_R7R8_HSPA(FULL_VERSION).mak)
+
+USER_SPECIFIC.mak
+
+Verno_XXX_XXX.bld
+
+[ module ]
+
+[ rel ]
+
+…
+
+ 
+
+MediaTek Confidential . 2012 -2015 MediaTek Inc. Page 8 of 37
+This document contains information that is proprietary to MediaTek Inc.
+Unauthorized reproduction or disclosure of this information in whole or in part is strictly prohibited.
+
+ 
+
+MOLY Make/Build Environment
+and Procedures Design Document
+MOLY Make/Build Environment
+and Procedures Design Document
+Build Scripts
+Project make/build procedure flow and relationship can be seen in Figure 1:
+
+Figure 1: Architecture of MOLY Make/Build Script
+
+make.sh,m, make.pl
+
+1.
+parse command line to determine project
+name,platform, and action.
+2.
+Check make/build directory exist or not.
+3.
+Check commsnd line argument is leagal or not
+execute Gtoos\make.exe –f GSM2.mak build
+script to perform action.
+$(PROJECT).mak
+
+1.
+List customer/project specific
+configuration options
+build.mak
+
+1.
+Execute actions including clean, link, and
+execute comp.bld to compile component’s library.
+Comp.mak
+
+1.
+Compile and assemble componnent module’s
+Option.mak/MODEM.mak
+1. Project common macros
+definition , and compile
+predefinitions.
+REL_$(PACKAGE).mak
+1. Custom release component
+configuration.
+USER_SPECIFIC.mak
+1. Debug modules
+configuration.
+Parse the command line to determine project name, platform, and action. The
+existence of a make directory and the validity of the command line arguments
+are verified. After verification is complete, the build script build.mak is executed
+to perform other actions.
+
+Usage:
+
+./make.sh [“project makefile”] action [modules] | file1[ file2[ …]]
+
+./m [“project makefile”] action [modules] | file1[ file2[ …]]
+
+sources and execute armar to be library.
+
+$(Module).mak
+
+1.
+Module’s
+include path, source files
+(C, Assembly, Header Files) list,
+include path for dependency
+checking, optional definition files.
+make.sh, m, make.pl
+
+MediaTek Confidential . 2012 -2015 MediaTek Inc.
+Page 9 of 37
+
+This document contains information that is proprietary to MediaTek Inc.
+Unauthorized reproduction or disclosure of this information in whole or in part is strictly prohibited.
+
+ 
+
+MOLY Make/Build Environment
+and Procedures Design Document
+MOLY Make/Build Environment
+and Procedures Design Document
+
+If your filename of project makefile has special characters such as parentheses (),
+you need to use double quotation marks “”
+or escape character \ on Linux Bash shell.
+
+action
+= new (clean, scan, compile, link)
+= update (scan, compile, link)
+= remake (compile, link)
+= clean (clean)
+
+module
+= component module name (nvram,…)
+
+Example 1
+To make/build a new project, clean all old objects, libraries, and log files etc. The new action also creates the
+necessary directories, removes all temporary files, and flushes log files automatically.
+
+[user@linux ~/MOLY/mcu]$ ./make.sh ”MT6280_R7R8_HSPA(FULL_VERSION).mak” new
+
+Example 2
+To update project dependency, compile changed modules, and link. Note that update and remake actions do
+not remove temporary files, nor do they flush the log file. Build results are appended after last entry in the log file.
+
+[user@linux ~/MOLY/mcu]$ ./make.sh ”MT6280_R7R8_HSPA(FULL_VERSION).mak” update
+
+Example 3
+
+To recompile changed files only and link:
+
+[user@linux ~/MOLY/mcu]$ ./make.sh ”MT6280_R7R8_HSPA(FULL_VERSION).mak” remake
+
+Example 4
+
+To clean all objects, temporary files, libraries, and executable binaries. The log file is also flushed.
+
+[user@linux ~/MOLY/mcu]$ ./make.sh ”MT6280_R7R8_HSPA(FULL_VERSION).mak” clean
+
+Example 5
+
+To clean dedicated drv module’s object library. The log file is also flushed.
+
+[user@linux ~/MOLY/mcu]$ ./make.sh ”MT6280_R7R8_HSPA(FULL_VERSION).mak” clean drv
+
+MediaTek Confidential . 2012 -2015 MediaTek Inc.
+Page 10 of 37
+
+This document contains information that is proprietary to MediaTek Inc.
+Unauthorized reproduction or disclosure of this information in whole or in part is strictly prohibited.
+
+ 
+
+Make/Build Environment
+Make/Build Environment
+Module Configuration Files
+The module configuration file is at mcu/make/module/$(category)/$(module).mak. It includes a
+module’s include path, source files (C, Assembly) list, etc.
+
+For example:
+[ mcu/make/module/driver/drv.mak ]
+drv.mak
+
+ 
+
+drv.mak contains drv module source codes list, private compile predefinitions and include header files
+directory path.
+
+MediaTek Confidential . 2012 -2015 MediaTek Inc. Page 11 of 37
+This document contains information that is proprietary to MediaTek Inc.
+Unauthorized reproduction or disclosure of this information in whole or in part is strictly prohibited.
+
+ 
+
+Parameters Description
+SRC_LIST Lists all the drv module’s source code files, including C and
+assembly sources.
+Important Notice:
+1. SOURCE FILE ONLY. DO NOT list header files.
+2. Source files with same name but different paths are NOT
+permitted in one module.
+Sample content:
+# Define source file lists to SRC_LIST
+SRC_LIST = driver/drv/src/bf.c \
+driver/drv/src/e_compass_sensor.c \
+driver/drv/src/e_compass_main.c \
+driver/drv/src/sim_msdc_test.c \
+driver/drv/src/BC_drv.c \
+service/sys_svc/fota/src/fue_emmc_adapt.c
+MEDIATEK CONFIDENTIALCOMP_DEFS Lists all drv module’s private compile predefinition for C source
+code files.
+Note: The current implementation does not consider assembly
+predefinitions. APCS_INTWORK is a special keyword to indicate
+that the module is compiled or assembled with APCS Interwork
+specification (-apcs /interwork).
+Sample content:
+COMP_DEFS = APCS_INTWORK
+INC_DIR Lists all the drv module’s included header files directory path.
+Sample content:
+INC_DIR = driver/drv/include \
+interface/driver/connectivity/usb_driver \
+driver/connectivity/usb_driver/inc
+
+MOLY Make/Build Environment
+and Procedures Design Document
+MOLY Make/Build Environment
+and Procedures Design Document
+
+In the drv.mak, we use standard make file syntax to wrap the built files with compile options. By doing
+this, the file build time could be saved when the corresponding compile options are not defined. The
+syntax is as below.
+
+.
+Syntax (if __CARD_DOWNLOAD__ is defined, need to build “driver/drv/src/cdl.c “.)
+ifneq ($(filter __CARD_DOWNLOAD__, $(strip $(MODULE_DEFS))),)
+SRC_LIST += driver/drv/src/cdl.c
+
+endif
+
+.
+Syntax (if __CARD_DOWNLOAD__ is not defined, need to build “driver/drv/src/cdl.c “.)
+ifeq ($(filter__CARD_DOWNLOAD__, $(strip $(MODULE_DEFS))),)
+
+SRC_LIST += driver/drv/src/cdl.c
+endif
+
+Note:
+
+.
+Use MODULE_DEFS in $(module).mak conditional statement (other than COM_DEFS)
+MediaTek Confidential . 2012 -2015 MediaTek Inc. Page 12 of 37
+
+This document contains information that is proprietary to MediaTek Inc.
+Unauthorized reproduction or disclosure of this information in whole or in part is strictly prohibited.
+
+ 
+
+Make/Build Environment
+Make/Build Environment
+Intermediate Build Scripts and Log File
+The main build script generates several intermediate build scripts to transfer needed information. All
+temporary files in the tmp directory which path is mcu/build/$(project)/$(flavor)/tmp
+
+For example:
+
+[ mcu/build/MT6280_R7R8_HSPA/FULL_VERSION/tmp ]
+~buildinfo.tmp
+~categorymapping.mak
+~compbld.tmp
+
+ 
+
+MediaTek Confidential . 2012 -2015 MediaTek Inc. Page 13 of 37
+This document contains information that is proprietary to MediaTek Inc.
+Unauthorized reproduction or disclosure of this information in whole or in part is strictly prohibited.
+
+ 
+
+File Name Description
+~buildinfo.tmp The file contains custom name, project name, and platform
+definition for build.mak and Option.mak
+to reference.
+Sample content:
+CUSTOMER=MT6280_R7R8
+PROJECT=HSPA
+CMD_ARGU=-j24
+BUILD_DATE_TIME=2012/07/11 20:00
+…MEDIATEK CONFIDENTIAL~categorymapping.mak The file is a module mapping table containing module category
+and module makefile path.
+Sample content:
+DRV_MODULE_CATEGORY = module/driver
+MEDIA_MODULE_CATEGORY = module/middleware
+MCD_MODULE_CATEGORY = module/modem/common
+INIT_MODULE_CATEGORY = module/service
+…
+~compbld.tmp Component modules needed build information.
+Sample content:
+ASM = tools/GCC/4.6.2/linux/bin/arm-none-eabi-as
+LIB = tools/GCC/4.6.2/linux/bin/arm-none-eabi-ar
+CC = tools/GCC/4.6.2/linux/bin/arm-none-eabi-gcc -mthumb
+CC32 = tools/GCC/4.6.2/linux/bin/arm-none-eabi-gcc -marm
+CFLAGS = -march=armv7-r -mcpu=cortex-r4 -mlittle-endian
+VIA = @
+AFLAGS = -march=armv7-r -mcpu=cortex-r4
+…
+
+ 
+
+MOLY Make/Build Environment
+and Procedures Design Document
+MOLY Make/Build Environment
+and Procedures Design Document
+5
+Generated Objects, Libraries, Executable Binary and Log
+Files
+The build script generate log, object build directory according to customer, project, and platform.
+
+For example:
+
+[ mcu/build/MT6280_R7R8_HSPA/FULL_VERSION/ ]
+
+[ bin ]
+[ dep ]
+[ lib ]
+[ log ]
+[ module ]
+[ obj ]
+link.log
+
+ 
+
+…
+
+File / Directory Name Description
+[ dep ] Project module dependency rules directory. These .dep files are
+generated by “gcc –MMD -MF” in Comp.mak.
+For example:
+[ mcu/build/MT6280_R7R8_HSPA/FULL_VERSION/bin/dep ]
+drv.dep
+nvram.dep
+…
+[ lib ] Component modules generated library directory.
+For example:
+[ mcu/build/MT6280_R7R8_HSPA/FULL_VERSION/bin/lib ]
+drv.dep
+nvram.lib
+…
+[ log ] Comp.mak generates a log file when building each component. The log
+records the compiling and archiving process of each component, and is
+placed in the log directory.
+Build script generates and flushes the above log files if the script executes
+a clean action, or actions which depend on the clean action.
+[ module ] Module’s include path, source files (C, Assembly, Header Files) list and
+optional definition files.
+For example:
+[ mcu/build/MT6280_R7R8_HSPA/FULL_VERSION/bin/module ]
+drv.list
+
+MediaTek Confidential . 2012 -2015 MediaTek Inc. Page 14 of 37
+This document contains information that is proprietary to MediaTek Inc.
+Unauthorized reproduction or disclosure of this information in whole or in part is strictly prohibited.
+
+ 
+
+MOLY Make/Build Environment
+and Procedures Design Document FOR yuqing.zhang@ ck-telecom.com USE ONLY.def
+drv.inc
+drv.ade
+Build script generates those files by executing a genmoduleinfo action,
+those files is generated since codegen needs $(module).def to get module
+specified compile options.
+drv.lis contains drv module source codes list; drv.def contains drv module’s
+private compile predefinitions; drv.inc contains drv module’s include
+header files directory path; drv.ade contains drv module’s private compile
+predefinitions for assembly code. MEDIATEK CONFIDENTIAL
+MOLY Make/Build Environment
+and Procedures Design Document FOR yuqing.zhang@ ck-telecom.com USE ONLY.def
+drv.inc
+drv.ade
+Build script generates those files by executing a genmoduleinfo action,
+those files is generated since codegen needs $(module).def to get module
+specified compile options.
+drv.lis contains drv module source codes list; drv.def contains drv module’s
+private compile predefinitions; drv.inc contains drv module’s include
+header files directory path; drv.ade contains drv module’s private compile
+predefinitions for assembly code. MEDIATEK CONFIDENTIAL[ obj ] Object directory contains each module’s .obj files.
+For example:
+[ mcu/build/MT6280_R7R8_HSPA/FULL_VERSION/bin/obj ]
+[ drv ]
+[ nvram ]
+…
+[ lib ] Library directory contains each module’s .lib files.
+For example:
+[ mcu/build/MT6280_R7R8_HSPA/FULL_VERSION/bin/lib ]
+drv.lib
+nvram.lib
+…
+link.log The log file records the warnings, errors or other information in linking
+process.
+
+MediaTek Confidential . 2012 -2015 MediaTek Inc. Page 15 of 37
+This document contains information that is proprietary to MediaTek Inc.
+Unauthorized reproduction or disclosure of this information in whole or in part is strictly prohibited.
+
+ 
+
+MOLY Make/Build Environment
+and Procedures Design Document
+MOLY Make/Build Environment
+and Procedures Design Document
+Associated Perl Files
+There are several Perl files used during build/make procedures. The following are the Perl file list and
+description of each file.
+
+.
+make.pl
+.
+build.mak
+No File Name File Path Description
+make.pl
+1 make <root folder> Main build script. Parse command line arguments
+and execute makefile according to the specified
+parameters. (customer, project, action, modules)
+2 parse_comp_err <root folder>/tools Parse errors in the log file of each component.
+Merge codegen.log to comp_err.txt
+3 thirdparties <root folder>/tools copy(-cp) /remove(-rm) some associated tools
+4 time <root folder>/tools Print current time. (format: yyyy/MM/dd/hh/mm/ss)
+5 GetDepMod <root folder>/tools Get dependency module(s) when you update
+source(s) / header(s)
+
+No File Name File Path Description
+build.mak
+1 append2 <root folder>/tools Append filename / input strings / flash configuration
+to a file.
+2 bl_append <root folder>/tools Append information to boot loader binary file
+3 cfgGen <root folder>/tools Generate CFG file for flash tool.
+4 CheckBinaryBlockUs
+age
+<root folder>/tools This script will check if code ROM size is enough
+for all binaries.
+5 chk_feature_option <root folder>/tools This script will check whether feature options are
+redefined in project makefile and these redefined
+options value are different.
+6 chk_lib_err_warn <root folder>/tools Check warning message in component compilation
+log file.
+7 chk_verno.pl <root folder>/tools Check verno info.
+8 ckFactoryBin <root folder>/tools This script will check factory bin before building with
+SPLIT_BINARY_SUPPORT=FACTORY_COMBIN
+E case.
+9 ckMemLayout <root folder>/tools Check scatter file and memory device consistency
+10 ckSysDrv <root folder>/tools Parse prepocessed fs_quota.c and
+nvram_user_config.c; check if system drive space
+is enough and display current flash usage
+11 CMMAutoGen <root folder>/tools Check if system drive space is enough and display
+current flash usage
+12 drv_feature_check <root folder>/tools Check the macros in the drv predefinition files listed
+by driver/drv_def/drv_features.h.
+13 extract_obj_from_lib <root folder>/tools Extract obj file from library.
+14 get_log <root folder>/tools Parse compile logs and dump them to a single log
+file
+
+MediaTek Confidential . 2012 -2015 MediaTek Inc. Page 16 of 37
+This document contains information that is proprietary to MediaTek Inc.
+Unauthorized reproduction or disclosure of this information in whole or in part is strictly prohibited.
+
+ 
+
+MOLY Make/Build Environment
+and Procedures Design Document
+.
+Codegen.mak
+15 gfh_process <root folder>/tools
+16 lnitem <root folder>/tools Break all words(e.g. compile options, include dirs)
+into lines.
+17 sortlib <root folder>/tools Sort libraries in ~libs.tmp file before linking.
+18 time <root folder>/tools Print current time. (format: yyyy/MM/dd/hh/mm/ss)
+
+No File Name File Path Description
+Codegen.mak
+emiMCPcheck <root folder>/tools Parse custom_MemoryDevice.h to get memory
+device type and part number and parse
+custom_EMI.h to retrieve the EMI setting, then calc
+the latency on the specific platform.
+gencategorymapping <root folder>/tools
+mcdparser <root folder>/modem/tools MediaTek Coding/Decoding parser which can
+convert ASN files into mcd_table.c / mcd.h and
+provide a mass of structure header files.
+objListGen <root folder>/tools
+pack_dep_gen <root folder>/tools
+pre_mcdparser <root folder>/modem/tools MediaTek Coding/Decoding parser which can
+convert ASN files into mcd_table.c / mcd.h and
+provide a mass of structure header files.
+scsi_generate <root folder>/
+modem/common/scsi/gen
+Support the preprocess the asn files and generate
+the CoDec.
+ss_lcs_generate <root folder>/
+modem/l4/csm/ss/tools/
+Generate ASN codec template files for project.
+sys_auto_gen. <root folder>/tools This script will invoke sysGen1.pl, scatGen.pl and
+sysGen2.pl to generate image layout.
+sys_mem_gen.pl <root folder>/tools Calculate system memory size and generate
+header files
+sysgen_init.pl <root folder>/tools This script will copy files from mcu/custom/system
+to build folder for sysgen.
+uas_generate <root folder>/modem/uas/
+<root folder>/
+modem/uas_tdd128/
+Take the feature from Build.mak, preprocess the
+dbme asn files, generate the rrc_asn.h and related
+CoDec files.
+updatemcddll_msvc <root folder>/
+modem/common/mcddll/
+The script to generate mcddll.dll file.
+
+MediaTek Confidential . 2012 -2015 MediaTek Inc. Page 17 of 37
+This document contains information that is proprietary to MediaTek Inc.
+Unauthorized reproduction or disclosure of this information in whole or in part is strictly prohibited.
+
+ 
+
+MOLY Make/Build Environment
+and Procedures Design Document FOR yuqing.zhang@ ck-telecom.com USE ONLY
+MOLY Make/Build Environment
+and Procedures Design Document FOR yuqing.zhang@ ck-telecom.com USE ONLYy
+
+ 
+
+Build/make procedures and functionality are listed below:
+
+No Procedures / Functionality Description
+1 Create project root directory for project sources, master build batch script and make scripts.
+2 new
+Make/build new HSPA project, clean all old objects, libraries, and log files etc.
+The new action also creates necessary directories, removes all temporary files, and flushes
+log files automatically.
+[user@linux ~/MOLY/mcu]$ ./make.sh ”MT6280_R7R8_HSPA(FULL_VERSION).mak” new
+The new action depends on the cleanall, genlog, sysgen, cleancodegen, asngen,
+codegen, asnregen, update .
+Therefore, it cleans all intermediate scripts and log files, scans header file dependency,
+builds component module’s libraries, links, and generates an executable image file.
+MEDIATEK CONFIDENTIAL3 clean
+Clean all objects, temporary files, libraries, and executable binaries. The log file is also
+flushed.
+[user@linux ~/MOLY/mcu]$ ./make.sh ”MT6280_R7R8_HSPA(FULL_VERSION).mak” clean
+The clean action checks object directories, and creates them automatically if they do not
+exist. If no modules are indicated for cleaning, then by default, all modules are cleaned.
+4 clean $(module)
+Clean dedicated drv modules’ object libraries. The log file is also flushed.
+[user@linux ~/MOLY/mcu]$ ./make.sh ”MT6280_R7R8_HSPA(FULL_VERSION).mak” clean drv
+or Clean dedicated drv, nvram… modules’ object libraries.
+[user@linux ~/MOLY/mcu]$ ./make.sh ”MT6280_R7R8_HSPA(FULL_VERSION).mak” clean drv
+nvram
+
+MediaTek Confidential . 2012 -2015 MediaTek Inc. Page 18 of 37
+This document contains information that is proprietary to MediaTek Inc.
+Unauthorized reproduction or disclosure of this information in whole or in part is strictly prohibited.
+
+ 
+
+MOLY Make/Build Environment
+and Procedures Design Document FOR yuqing.zhang@ ck-telecom.com USE ONLY
+MOLY Make/Build Environment
+and Procedures Design Document FOR yuqing.zhang@ ck-telecom.com USE ONLYupdate
+Update project dependency, and compile changed modules, link. Note that, the update and
+remake actions do not remove temporary files, nor do they flush the log file. Build results
+are appended after last log file.
+[user@linux ~/MOLY/mcu]$ ./make.sh ”MT6280_R7R8_HSPA(FULL_VERSION).mak” update
+The update action depends on genlog, cleanbin, umts_gen, codegen, cksysdrv_slim
+remake. The module’s objects and library are not cleaned. However, the update action
+checks dependency and remakes modified sources, links to binary. Neither update nor
+remake depends on cleanall; therefore, an object directory is not created, and the log file is
+not flushed. The new or clean action must be executed to flush the log file.
+MEDIATEK CONFIDENTIAL6 update $(module)
+Update dedicated drv modules’ object libraries.
+[user@linux ~/MOLY/mcu]$ ./make.sh ”MT6280_R7R8_HSPA(FULL_VERSION).mak” update drv
+or Update dedicated drv, nvram modules’ object libraries.
+[user@linux ~/MOLY/mcu]$ ./make.sh ”MT6280_R7R8_HSPA(FULL_VERSION).mak” update drv
+nvram
+7 remake
+Recompile changed files, and link:
+[user@linux ~/MOLY/mcu]$ ./make.sh ”MT6280_R7R8_HSPA(FULL_VERSION).mak” remake
+The remake action depends on mcp_check, genlog, cleanbin, genverno, libs,
+$(BIN_FILE), cmmgen, cfggen, done. libs composes the libraries of each components
+and $(BIN_FILE) link them to the binary.
+
+MediaTek Confidential . 2012 -2015 MediaTek Inc. Page 19 of 37
+This document contains information that is proprietary to MediaTek Inc.
+Unauthorized reproduction or disclosure of this information in whole or in part is strictly prohibited.
+
+ 
+
+MOLY Make/Build Environment
+and Procedures Design Document FOR yuqing.zhang@ ck-telecom.com USE ONLY
+MOLY Make/Build Environment
+and Procedures Design Document FOR yuqing.zhang@ ck-telecom.com USE ONLYremake $(module)
+Remake dedicated drv modules’ object libraries.
+[user@linux ~/MOLY/mcu]$ ./make.sh ”MT6280_R7R8_HSPA(FULL_VERSION).mak” remake drv
+or Remake dedicated drv, nvram… modules’ object libraries.
+[user@linux ~/MOLY/mcu]$ ./make.sh ”MT6280_R7R8_HSPA(FULL_VERSION).mak” remake drv
+nvram
+MEDIATEK CONFIDENTIAL9 codegen
+Generate tst database:
+[user@linux ~/MOLY/mcu]$ ./make.sh ”MT6280_R7R8_HSPA(FULL_VERSION).mak” codegen
+The codegen action depends on ss_lcs_gen, nvram_edit_h_gen, nvram_auto_gen
+genmoduleinfo cgen.
+11 cmmgen
+To generate cmm file:
+[user@linux ~/MOLY/mcu]$ ./make.sh ”MT6280_R7R8_HSPA(FULL_VERSION).mak” cmmgen
+12 sysgen
+To generate memory related files under customer folders:
+[user@linux ~/MOLY/mcu]$ ./make.sh ”MT6280_R7R8_HSPA(FULL_VERSION).mak” sysgen
+The sysgen action depends on sys_auto_gen and sys_mem_gen.
+The sys_auto_gen action depends on sysgen_conf and ckmemlayout.
+The sysgen_conf action depends on emigen, mcp_check and obj_list_gen.
+13 emigen
+To generate combo_flash_config.h, combo_flash_id.h, custom_EMI.h,
+custom_EMI_INFO.h, custom_EMI_release.h, custom_flash.h, custom_flash_norfdm5.h
+and flash_opt_gen.h files.
+[user@linux ~/MOLY/mcu]$ ./make.sh ”MT6280_R7R8_HSPA(FULL_VERSION).mak” emigen
+
+MediaTek Confidential . 2012 -2015 MediaTek Inc. Page 20 of 37
+This document contains information that is proprietary to MediaTek Inc.
+Unauthorized reproduction or disclosure of this information in whole or in part is strictly prohibited.
+
+ 
+
+MOLY Make/Build Environment
+and Procedures Design Document FOR yuqing.zhang@ ck-telecom.com USE ONLYf platform support the SF, it also generates combo_flash_config.h, combo_flash_id.h,
+combo_sfi_config.h and combo_sfi_defs.h
+MOLY Make/Build Environment
+and Procedures Design Document FOR yuqing.zhang@ ck-telecom.com USE ONLYf platform support the SF, it also generates combo_flash_config.h, combo_flash_id.h,
+combo_sfi_config.h and combo_sfi_defs.h
+14 emiclean
+To clean EMI setting:
+[user@linux ~/MOLY/mcu]$ ./make.sh ”MT6280_R7R8_HSPA(FULL_VERSION).mak”
+emiclean
+15 drv_feature_check
+To check the macros in the drv predefinition files listed by driver/drv_def/drv_features.h.
+[user@linux ~/MOLY/mcu]$ ./make.sh ”MT6280_R7R8_HSPA(FULL_VERSION).mak”
+drv_feature_check
+The drv_feature_check action depends on gen_infolog.
+MEDIATEK CONFIDENTIAL16 bootloader
+To generate bootloader binary file:
+[user@linux ~/MOLY/mcu]$ ./make.sh ”MT6280_R7R8_HSPA(FULL_VERSION).mak”
+bootloader
+17 check_dep
+To list dependency modules after sources/headers updated:
+[user@linux ~/MOLY/mcu]$ ./make.sh ”MT6280_R7R8_HSPA(FULL_VERSION).mak”
+check_dep driver/drv/include/drv_trc.h
+18 remake_dep
+rebuild dependency libraries after sources/headers updated:
+[user@linux ~/MOLY/mcu]$ ./make.sh ”MT6280_R7R8_HSPA(FULL_VERSION).mak”
+remake_dep driver/drv/include/drv_trc.h
+
+MediaTek Confidential . 2012 -2015 MediaTek Inc. Page 21 of 37
+This document contains information that is proprietary to MediaTek Inc.
+Unauthorized reproduction or disclosure of this information in whole or in part is strictly prohibited.
+
+ 
+
+MOLY Make/Build Environment
+and Procedures Design Document
+MOLY Make/Build Environment
+and Procedures Design Document
+s
+
+ 
+
+This section describes the frequently used options for configuring the flavor of a build.
+
+5.1 Core Software
+Table 1: Core Software Options
+
+Options in $(CUSTOMER)_$(PROJECT)($(FLAVOR)).mak , and Option.mak; Usually Customer can
+refer to “release_notes”.
+
+For example:
+
+ 
+
+MediaTek Confidential . 2012 -2015 MediaTek Inc. Page 22 of 37
+
+This document contains information that is proprietary to MediaTek Inc.
+Unauthorized reproduction or disclosure of this information in whole or in part is strictly prohibited.
+
+ 
+
+MOLY Make/Build Environment
+and Procedures Design Document
+MOLY Make/Build Environment
+and Procedures Design Document
+n
+
+ 
+
+This section lists the key sections in the build scripts.
+
+6.1 make.sh, m and make.pl –
+Main Build Script File
+The make.pl is implemented by Perl script, and will call GNU make command to execute build action.
+
+Core section:
+
+$makeCmd = “make”;
+$makeFolder = “make/”;
+$myMF = “build.mak”;
+$result = system(“${makeCmd} -f${makeFolder}${myMF} -r -R CUSTOMER=$custom
+PROJECT=$project FLAVOR=$flavor $target_option $action”);
+
+ 
+
+Explanation:
+.
+${makeCmd} is the GNU make executable.
+
+ 
+
+6.2 build.mak/Codegen.mak –
+Main Build Script
+Core sections of build.mak and Codegen.mak are listed below:
+
+.
+build.mak
+Major Actions in build.mak, these actions will be parsed in make.pl:
+# *************************************************************************
+# New Build
+# *************************************************************************
+
+ifeq ($(strip $(NEED_BUILD_BOOTLOADER)),TRUE)
+ifneq ($(filter UMTS HSPA TDD128 TDD128DPA TDD128HSPA,$(strip $(call Upper,$(PROJECT)))),)
+new : backup cleanall genlog sysgen cleancodegen asngen umts_gen codegen codegen_check asnregen bootloader update
+else
+new : backup cleanall genlog sysgen cleancodegen asngen codegen codegen_check asnregen bootloader update
+endif
+else
+ifneq ($(filter UMTS HSPA TDD128 TDD128DPA TDD128HSPA,$(strip $(call Upper,$(PROJECT)))),)
+new : backup cleanall genlog sysgen cleancodegen asngen umts_gen codegen codegen_check asnregen update
+else
+new : backup cleanall genlog sysgen cleancodegen asngen codegen codegen_check asnregen update
+endif
+endif
+
+# *************************************************************************
+# Update Build
+# *************************************************************************
+
+ifeq ($(strip $(ACTION)),slim_update)
+
+ifeq ($(strip $(CUSTOM_RELEASE)),TRUE)
+ifneq ($(filter UMTS HSPA TDD128 TDD128DPA TDD128HSPA,$(strip $(call Upper,$(PROJECT)))),)
+update : backup genlog cleanbin umts_gen codegen cksysdrv_slim remake
+else
+
+MediaTek Confidential . 2012 -2015 MediaTek Inc. Page 23 of 37
+This document contains information that is proprietary to MediaTek Inc.
+Unauthorized reproduction or disclosure of this information in whole or in part is strictly prohibited.
+
+ 
+
+MOLY Make/Build Environment
+and Procedures Design Document
+MOLY Make/Build Environment
+and Procedures Design Document
+e
+endif
+else
+ifneq ($(filter UMTS HSPA TDD128 TDD128DPA TDD128HSPA,$(strip $(call Upper,$(PROJECT)))),)
+update : backup genlog cleanbin umts_gen codegen cksysdrv_slim remake
+else
+update : backup genlog cleanbin codegen cksysdrv_slim remake
+endif
+endif
+
+ 
+
+else
+## update
+
+ 
+
+ifeq ($(strip $(CUSTOM_RELEASE)),TRUE)
+ifneq ($(filter UMTS HSPA TDD128 TDD128DPA TDD128HSPA,$(strip $(call Upper,$(PROJECT)))),)
+update : backup genlog cleanbin umts_gen codegen mcddll_update cksysdrv_slim remake
+else
+update : backup genlog cleanbin codegen mcddll_update cksysdrv_slim remake
+endif
+else
+ifneq ($(filter UMTS HSPA TDD128 TDD128DPA TDD128HSPA,$(strip $(call Upper,$(PROJECT)))),)
+update : backup genlog cleanbin umts_gen codegen mcddll_update cksysdrv_slim remake
+else
+update : backup genlog cleanbin codegen mcddll_update cksysdrv_slim remake
+endif
+endif
+
+ 
+
+endif
+
+# *************************************************************************
+# Remake Build
+# *************************************************************************
+
+ 
+
+ifneq ($(strip $(MODIS_CONFIG)),TRUE)
+ifeq ($(strip $(call Upper,$(REMAKE_MODS))),BOOTLOADER)
+remake : backup bootloader done
+else
+remake : backup mcp_check genlog cleanbin genverno libs $(BIN_FILE) cmmgen cfggen done
+
+ 
+
+endif
+else # MODIS_CONFIG == TRUE
+remake : mcp_check genlog cleanbin genverno
+endif
+
+ 
+
+# *************************************************************************
+# BOOTLOADER Targets
+# *************************************************************************
+
+ 
+
+ifneq ($(strip $(MODIS_CONFIG)),TRUE)
+ifeq ($(strip $(ACTION)),bootloader)
+bootloader: gen_bl_verno gencompbld bl_preflow $(BTLD_BIN_FILE) $(BTLD_EXT_BIN_FILE) done
+else
+bootloader: gen_bl_verno gencompbld bl_preflow $(BTLD_BIN_FILE) $(BTLD_EXT_BIN_FILE)
+
+ 
+
+endif
+else
+bootloader:
+endif
+
+ 
+
+MediaTek Confidential . 2012 -2015 MediaTek Inc. Page 24 of 37
+This document contains information that is proprietary to MediaTek Inc.
+Unauthorized reproduction or disclosure of this information in whole or in part is strictly prohibited.
+
+ 
+
+MOLY Make/Build Environment
+and Procedures Design Document
+MOLY Make/Build Environment
+and Procedures Design Document
+*
+# TARGET: drv_feature_check
+# Check DRV Feature Files
+# *************************************************************************
+
+ 
+
+drv_feature_check: gen_infolog
+
+ 
+
+# *************************************************************************
+# TARGET: cmmgen
+# Generate cmm files for different SUB_BOARD_VER
+# *************************************************************************
+
+ 
+
+cmmgen: $(strip $(TMPDIR))/~customIncDef.tmp copycmm
+ifeq ($(call Upper,$(strip $(LEVEL))),VENDOR)
+cmmgen:
+else
+cmmgen:
+endif
+
+ 
+
+.
+Codegen.mak:
+# *************************************************************************
+# Tools code preprocess and generation
+# *************************************************************************
+
+ifeq ($(strip $(ACTION)),slim_codegen)
+ifneq ($(filter UMTS HSPA TDD128 TDD128DPA TDD128HSPA,$(strip $(call Upper,$(PROJECT)))),)
+slim_codegen: cleancodegen asngen umts_gen codegen asnregen cleanbin send
+else
+slim_codegen: cleancodegen asngen codegen asnregen cleanbin send
+endif
+@echo Done.
+else
+
+## codegen
+
+ifneq ($(filter UMTS HSPA TDD128 TDD128DPA TDD128HSPA,$(strip $(call Upper,$(PROJECT)))),)
+code_generate: cleancodegen asngen umts_gen codegen asnregen cleanbin mcddll_update send
+else
+code_generate: cleancodegen asngen codegen asnregen cleanbin mcddll_update send
+endif
+@echo Done.
+endif
+
+codegen : ss_lcs_gen gencustominfo nvram_edit_h_gen nvram_auto_gen genmoduleinfo cgen
+
+ 
+
+# *************************************************************************
+# TARGET: sysgen
+# Generate custom\system\BB\* base on makefile and EMI.h
+# *************************************************************************
+
+ 
+
+sysgen: sys_auto_gen sys_mem_gen
+sys_auto_gen: sysgen_conf ckmemlayout
+
+ 
+
+sysgen_conf: emigen mcp_check obj_list_gen
+
+ 
+
+# *************************************************************************
+# TARGET: emigen
+# Generate emi settings based on configurations in custom_MemoryDevice.h
+# *************************************************************************
+
+ 
+
+emigen: sysgen_init
+
+ 
+
+MediaTek Confidential . 2012 -2015 MediaTek Inc. Page 25 of 37
+This document contains information that is proprietary to MediaTek Inc.
+Unauthorized reproduction or disclosure of this information in whole or in part is strictly prohibited.
+
+ 
+
+.
+MEDIATEK CONFIDENTIALCutline:
+.Description of action “new”, “update”, and “remake”.
+FOR yuqing.zhang@ ck-telecom.com USE ONLYMake/Build Environment
+and Procedures Design Document
+.
+MEDIATEK CONFIDENTIALCutline:
+.Description of action “new”, “update”, and “remake”.
+FOR yuqing.zhang@ ck-telecom.com USE ONLYMake/Build Environment
+and Procedures Design Document
+MediaTek Confidential . 2012 -2015 MediaTek Inc. Page 26 of 37
+
+This document contains information that is proprietary to MediaTek Inc.
+Unauthorized reproduction or disclosure of this information in whole or in part is strictly prohibited.
+
+ 
+
+MOLY Make/Build Environment
+and Procedures Design Document FOR yuqing.zhang@ ck-telecom.com USE ONLY
+MOLY Make/Build Environment
+and Procedures Design Document FOR yuqing.zhang@ ck-telecom.com USE ONLYDescription
+cleanall Check build root, target folder, comp, lib, comp log folder and clean bin
+folder, elf, lis, htm, log files, tst database files, obj, lib files
+cmmgen Generate $(TARGNAME)_nocode.cmm and
+$(TARGNAME)_HQ_Only.cmm.
+sysgen Generate system-related files based on customer folders
+emigen Generate memory-related files based on custom_FeatureConfig.h,
+custom_MemoryDevice.h and MemoryDeviceList_MTXXX_XXX.xls.
+mcp_check Parse custom_MemoryDevice.h to get memory device type and part
+number, parse custom_EMI.h to retrieve the EMI setting and calc the
+latency on the specific platform MEDIATEK CONFIDENTIALdrv_feature_check To check the macros in the drv predefinition files listed by
+driver/drv_def/drv_features.h
+gen_infolog Generate info.log
+asngen Generate ASN codec template file for project
+codegen Generate database for TST and Trace
+nvram_auto_gen Generate nvram part
+cleancodegen Delete codegen.lis
+asnregen Generate ASN codec template file for catcher
+genlog Put some parameter values into info.log and infomake.log
+cleanbin Remove the executable binary files in build/$(project)/$(flavor)/bin folder.
+mcddll_update To generate and update TST mcddll.dll file
+cksysdrv To check whether system drive is enough
+genverno Generate verno.c/.h
+$(BIN_FILE) Generate bin file
+cleanmod Clean bin, elf, lis, htm, sym and clean specific log and lib files
+emiclean Delete emigen-related files
+gen_bl_verno Generate bootloader versoin number
+$(BTLD_BIN_FILE) Generate bootloader binary file
+Done Delete intermediate files, check error, display “Done” and localtime.
+
+.
+Library Creation in build.mak:
+# *************************************************************************
+# Library Targets
+# *************************************************************************
+
+libs: cleanlib startbuildlibs $(COMPLIBLIST)
+
+cleanlib:
+
+……
+
+%.lib:
+echo Beginning $* component build process… >> $(LOG)
+
+……
+
+MediaTek Confidential . 2012 -2015 MediaTek Inc. Page 27 of 37
+This document contains information that is proprietary to MediaTek Inc.
+Unauthorized reproduction or disclosure of this information in whole or in part is strictly prohibited.
+
+ 
+
+MOLY Make/Build Environment
+and Procedures Design Document
+-fmake/Comp.mak -r -R TMPDIR=$(strip $(TMPDIR)) $(strip $(CMD_ARGU)) COMPONENT=$*
+update_lib > $(strip $(COMPLOGDIR))/$*.log 2>&1)
+……
+MOLY Make/Build Environment
+and Procedures Design Document
+-fmake/Comp.mak -r -R TMPDIR=$(strip $(TMPDIR)) $(strip $(CMD_ARGU)) COMPONENT=$*
+update_lib > $(strip $(COMPLOGDIR))/$*.log 2>&1)
+……
+
+($(CAT) $(strip $(COMPLOGDIR))/$*.log >> $(LOG))
+
+.
+cleanlib: Delete bin, elf, lis, sym, htm files and *.lib files.
+.
+startbuildlibs: Print build libs’ name to screen.
+.
+$(COMPLIBLIST): Invoke comp.mak to build libraries.
+.
+“$(MAKE) -fmake/Comp.mak -r -R TMPDIR=$(strip $(TMPDIR)) $(strip $(CMD_ARGU)) COMPONENT=$* update_lib” is
+invoked to create a library.
+Binary Creation in build.mak:
+
+# *************************************************************************
+# TARGET: $(BIN_FILE) and LINK
+# *************************************************************************
+
+ 
+
+$(BIN_FILE): LINK POSTBUILD POSTBUILD_CHECK
+LINK: LINK_BIN_FILE LINK_BIN_FILE_CHECK FROMELF_BIN_FILE
+
+ 
+
+# *************************************************************************
+# TARGET: LINK_BIN_FILE
+# Executable Targets
+# *************************************************************************
+
+ 
+
+LINK_BIN_FILE :GCC_LINK_BIN_FILE
+
+ 
+
+# *************************************************************************
+# TARGET: GCC_LINK_BIN_FILE
+# Executable Targets
+# *************************************************************************
+
+ 
+
+GCC_LINK_BIN_FILE:
+
+ 
+
+……
+
+@$(strip $(LINK)) $(strip $(VIA))$(strip $(TMPDIR))/~libs.tmp > $(TARGDIR)/link.log 2>&1
+
+……
+
+# *************************************************************************
+# TARGET: FROMELF_BIN_FILE
+# Executable Targets
+# *************************************************************************
+
+ 
+
+FROMELF_BIN_FILE::
+
+ 
+
+……
+
+@echo Creating binary file $(BIN_FILE)
+
+@$(strip $(BIN_CREATE)) -O binary $(strip $(TARGDIR))/$(IMG_FILE) $(strip $(TARGDIR))/$(BIN_FILE)
+
+……
+
+# *************************************************************************
+# TARGET: POSTBUILD
+# *************************************************************************
+
+POSTBUILD :GCC_POSTBUILD
+
+……
+perl tools/append2.pl $(strip $(FLASHFILE)) $(strip $(TARGDIR))/$(strip $(BIN_FILE)) ……
+……
+
+ 
+
+.
+ld ($(LINK)) links libraries, and objcopy $(BIN_CREATE) creates the binary.
+MediaTek Confidential . 2012 -2015 MediaTek Inc. Page 28 of 37
+This document contains information that is proprietary to MediaTek Inc.
+Unauthorized reproduction or disclosure of this information in whole or in part is strictly prohibited.
+
+ 
+
+A string noting the version of this format
+(16 chars) (“MTK_ROM_INFO_v01” with 0x00 ending)
+A string noting the version of this format
+(16 chars) (“MTK_ROM_INFO_v01” with 0x00 ending)
+Bin file name 64 bytes (with 0x00 ending)
+Project id 64 bytes (with 0x00 ending)
+Flash device count (FC) 1 byte
+Flash info
+a. Manufacture id (2bytes)
+b. Device id (2bytes)
+c. Extended device code 1 (2bytes)
+d. Extended device code 2 (2bytes)
+e. FAT start address (4bytes)
+f. FAT length (4bytes)
+16 bytes x FC
+NFB (0xffff) or 0x0000 2 bytes
+Bin file identifier 8 bytes (“MTK_BIN” with 0x00 ending)
+The total size of above items 4 bytes (Integer)
+
+MOLY Make/Build Environment
+and Procedures Design Document
+.
+Append2.pl appends the following information to bin file for using by flash tool.
+6.3 Comp.mak –
+Component Module Build Script
+Building Objects:
+
+# *************************************************************************
+# Component Targets
+# *************************************************************************
+# %.obj: %.c
+
+define target_compile_c_obj
+
+$(2): $(1)
+
+……
+
+ 
+
+@echo Compiling $$< … >$$(strip $$(COMPLOGDIR))/$$(strip $$(COMPONENT))/$$(basename $$(notdir $$@)).log
+
+ifeq ($$(strip $$(ACTION)),remake)
+@$$(CMPLR) $$(VIA)$$(COMPVIA_DIR)/$$(strip $$(COMPONENT)).via $$(VIA)$$(COMPVIA_DIR)/$$(strip
+$$(COMPONENT))_inc.via -c $$(CFLAGS) -o $$(COMPOBJS_DIR)/$$(notdir $$@) $$< 2>>$$(strip
+$$(COMPLOGDIR))/$$(strip $$(COMPONENT))/$$(basename $$(notdir $$@)).log
+
+else
+@$$(CMPLR) $$(VIA)$$(COMPVIA_DIR)/$$(strip $$(COMPONENT)).via $$(VIA)$$(COMPVIA_DIR)/$$(strip
+$$(COMPONENT))_inc.via -c $$(CFLAGS) $$(depend) $$(COMPDETS_DIR)/$$(basename $$(notdir $$@)).d -o
+$$(COMPOBJS_DIR)/$$(notdir $$@) $$< 2>>$$(strip $$(COMPLOGDIR))/$$(strip $$(COMPONENT))/$$(basename
+$$(notdir $$@)).log
+
+……
+
+ 
+
+endif
+
+……
+
+ 
+
+endef
+
+# %.obj: %.cpp
+
+define target_compile_cpp_obj
+
+$(2): $(1)
+
+……
+
+ 
+
+@echo Compiling $$< … >$$(strip $$(COMPLOGDIR))/$$(strip $$(COMPONENT))/$$(basename $$(notdir $$@)).log
+
+ifeq ($$(strip $$(ACTION)),remake)
+@$$(CPP_CMPLR) $$(VIA)$$(COMPVIA_DIR)/$$(strip $$(COMPONENT)).via $$(VIA)$$(COMPVIA_DIR)/$$(strip
+$$(COMPONENT))_inc.via -c $$(CPLUSFLAGS) -o $$(COMPOBJS_DIR)/$$(notdir $$@) $$< 2>>$$(strip
+
+MediaTek Confidential . 2012 -2015 MediaTek Inc. Page 29 of 37
+This document contains information that is proprietary to MediaTek Inc.
+Unauthorized reproduction or disclosure of this information in whole or in part is strictly prohibited.
+
+ 
+
+MOLY Make/Build Environment
+and Procedures Design Document
+MOLY Make/Build Environment
+and Procedures Design Document
+
+else
+@$$(CPP_CMPLR) $$(VIA)$$(COMPVIA_DIR)/$$(strip $$(COMPONENT)).via $$(VIA)$$(COMPVIA_DIR)/$$(strip
+$$(COMPONENT))_inc.via -c $$(CPLUSFLAGS) $$(depend) $$(COMPDETS_DIR)/$$(basename $$(notdir $$@)).d -o
+$$(COMPOBJS_DIR)/$$(notdir $$@) $$< 2>>$$(strip $$(COMPLOGDIR))/$$(strip $$(COMPONENT))/$$(basename
+$$(notdir $$@)).log
+
+endif
+
+……
+
+ 
+
+endef
+
+# %.obj: %.s
+
+define target_compile_asm_obj
+
+$(2): $(1)
+
+……
+
+ 
+
+@echo Compiling $$< … >$$(strip $$(COMPLOGDIR))/$$(strip $$(COMPONENT))/$$(basename $$(notdir $$@)).log
+
+ifeq ($$(strip $$(ACTION)),remake)
+@$$(ASM) $$(AINTWORK) $$(AFLAGS) $$(ADEFS) $$< -o $$(COMPOBJS_DIR)/$$(notdir $$@) 2>>$$(strip
+$$(COMPLOGDIR))/$$(strip $$(COMPONENT))/$$(basename $$(notdir $$@)).log
+
+else
+@$$(ASM) $$(AINTWORK) $$(AFLAGS) $$(ADEFS) $$< $$(AS_depend) $$(COMPDETS_DIR)/$$(basename $$(notdir
+$$@)).d -o $$(COMPOBJS_DIR)/$$(notdir $$@) 2>>$$(strip $$(COMPLOGDIR))/$$(strip
+$$(COMPONENT))/$$(basename $$(notdir $$@)).log
+
+endif
+
+……
+
+ 
+
+endef
+
+.
+define target_compile_c_obj part is responsible for compiling C code. For generating the .obj file,
+the target for processing .c file to .obj file will be automatically produced by eval function.
+
+.
+define target_compile_cpp_obj part is responsible for compiling C++ code. For generating
+the .obj file, the target for processing .cpp file to .obj file will be automatically produced by eval
+function.
+
+.
+define target_compile_asm_obj part is responsible for compiling assembly code. For generating
+the .obj file, the target for processing .S file to .obj file will be automatically produced by eval
+function.
+
+Building a Library:
+
+# *************************************************************************
+# Library Targets
+# *************************************************************************
+
+update_lib: $(TARGLIB)
+
+$(TARGLIB):
+
+# If library for customer release exists.
+
+# Copy and update it or create a new one
+
+……
+
+ 
+
+@$(strip $(LIB)) -r $(TARGLIB) $(VIA)$(OBJ_ARCHIVE_SORT)
+
+……
+
+ 
+
+@$(ECHO) -n “$(TARGLIB) is updated”
+
+MediaTek Confidential . 2012 -2015 MediaTek Inc. Page 30 of 37
+This document contains information that is proprietary to MediaTek Inc.
+Unauthorized reproduction or disclosure of this information in whole or in part is strictly prohibited.
+
+ 
+
+MOLY Make/Build Environment
+and Procedures Design Document
+MOLY Make/Build Environment
+and Procedures Design Document
+4
+Option.mak/Option_HAL.mak/MODEM.mak –
+Project common
+option, and macro definition Build Script
+$(COMMINCDIRS):
+
+# *************************************************************************
+# Common include file and output directory path
+# *************************************************************************
+
+ 
+
+COMMINCDIRS += interface/service/nvram
+COMMINCDIRS += $(strip $(BUILD_SYSDIR))
+……
+COMMINCDIRS += interface/driver/cmux \
+
+ 
+
+interface/delete \
+interface/middleware/gps
+……
+
+.
+COMMINCDIRS lists all global including paths for building all modules.
+In “make/module/$(category)/$(module).mak”, it lists the including paths only for building module
+$(module) instead. You can use “COMMINCDIRS += xxx/yyy” to add the global including path for
+all modules.
+
+$(COM_DEFS):
+
+# *************************************************************************
+# Component Compile Options
+# *************************************************************************
+
+ 
+
+COM_DEFS = $(CUSTOM_OPTION)
+……
+ifndef FLAVOR
+
+ 
+
+COM_DEFS += __FLAVOR_NOT_PRESENT__
+endif
+……
+
+.
+COM_DEFS lists all compile options for building all modules.
+In “make/module/$(category)/$(module).mak”, it lists the compile options only for building module
+xxx instead. You can use “COM_DEFS += XXX” to add the compile options for building all
+modules.
+
+$(COMP_TRACE_DEFS_MODEM):
+
+# *************************************************************************
+# Component trace definition header files
+# *************************************************************************
+
+ifdef BLUETOOTH_SUPPORT
+
+ifneq ($(strip $(BLUETOOTH_SUPPORT)),NONE)
+COMP_TRACE_DEFS_MODEM += btadp/include/bluetooth_trc.h
+COMP_TRACE_DEFS_MODEM += hal/bluetooth/common/include/btdrv_trc.h
+……
+
+ 
+
+endif
+endif
+
+.
+COMP_TRACE_DEFS_MODEM lists component trace definition header files.
+
+MediaTek Confidential . 2012 -2015 MediaTek Inc. Page 31 of 37
+This document contains information that is proprietary to MediaTek Inc.
+Unauthorized reproduction or disclosure of this information in whole or in part is strictly prohibited.
+
+ 
+
+MOLY Make/Build Environment
+and Procedures Design Document
+MOLY Make/Build Environment
+and Procedures Design Document
+USER_SPECIFIC.mak –
+debug modules configuration script
+#If CUSTOM_CFLAGS = # -gdwarf-3 in project makefile, set some modules to apply -gdwarf-3
+#Please remove 1st # in the following 2 lines
+#DEBUG_MODULES = # Value should be ALL or modules.
+#CUSTOM_CFLAGS := # Do not add any options for this.
+
+ 
+
+#If CUSTOM_CFLAGS = -gdwarf-3 in project makefile, set some modules NOT to apply -gdwarf-3
+#Please remove 1st # in the following line
+#NON_DEBUG_MODULES = # Value should be ALL or modules.
+
+ 
+
+#Example of DEBUG_MODULES
+#1. DEBUG_MODULES = all
+# CUSTOM_CFLAGS :=
+# ==> all modules will apply -gdwarf-3 when update, remake or new these modules
+#
+#2. DEBUG_MODULES = kal stacklib plutommi mtkapp t9
+# CUSTOM_CFLAGS :=
+# ==> only kal, stacklib, plutommi, mtkapp, t9 will apply -gdwarf-3
+# when update, remake these modules or new
+#
+#
+# NOTE: DEBUG_MODULES = all kal stacklib, all modules will apply -gdwarf-3
+
+ 
+
+The setting in USER_SPECIFIC.mak is global, and all projects in this codebase share the same
+setting. In customer project makefile, you can add two feature options called
+CUSTOM_DEBUG_MODULES and CUSTOM_NON_DEBUG_MODULES.
+
+The priority from high to low is
+
+1. CUSTOM_NON_DEBUG_MODULES
+2. CUSTOM_DEBUG_MODULES
+3. NON_DEBUG_MODULES
+4. DEBUG_MODULES
+You can get the debug settings log from infomake.log and $(module).log. If a module is in
+NON_DEBUG, it will force to filter out –debug from compile option, so that this module will not contain
+debug information. If a module is in DEBUG, it will automatically add –debug into compile option. If a
+module is in DEFALUT, it will not change the compile option.
+
+MediaTek Confidential . 2012 -2015 MediaTek Inc. Page 32 of 37
+
+This document contains information that is proprietary to MediaTek Inc.
+Unauthorized reproduction or disclosure of this information in whole or in part is strictly prohibited.
+
+ 
+
+MOLY Make/Build Environment
+and Procedures Design Document
+MOLY Make/Build Environment
+and Procedures Design Document
+t
+
+ 
+
+$(CUSTOM)_$(PROJECT)($(FLAVOR)).mak (e.g. MT6280_R7R8_HSPA(FULL_VERSION).mak) is
+the customer-project specific build script. The customer can customize the configurations in this file.
+The following describes some scenarios of the customization.
+
+7.1 Add Modules to or Remove Modules from the Build Procedure
+To complete this kind of configuration, the customer must understand the following variables in the
+make file:
+
+.
+COMPLIST: lists all source code modules that can be built into .lib. In an initial custom
+release, COMPLIST is the sum of CUS_REL_SRC_COMP. The following is the initial setting
+in a custom release.
+
+# Option.mak
+
+ifeq ($(strip $(CUSTOM_RELEASE)),TRUE)
+COMPLIST = $(strip $(CUS_REL_SRC_COMP))
+…
+endif
+
+.
+CUS_REL_MTK_COMP: lists all modules provided with .lib only. These .lib are put in
+mcu/mtk_rel/$(CUSTOM)_$(PROJECT)/$(FLAVOR)/lib
+
+(e.g. mcu/mtk_rel/MT6280_R7R8_HSPA/FULL_VERSION/lib).
+7.1.1 Add a Source Module
+1.
+Add the module “xyz” (in lower case) into COMPLIST and CUS_REL_SRC_COMP in
+make/$(CUSTOM)_$(PROJECT)($(FLAVOR)).mak depend on how you want to release this
+module.
+# *************************************************************************
+# Custom Release Component Configuration
+# *************************************************************************
+
+include make/rel/$(strip $(RELEASE_PACKAGE)).mak
+
+ifeq ($(strip $(CUSTOM_RELEASE)),TRUE)
+ifneq ($(findstring REL_SUB_, $(strip $(RELEASE_PACKAGE))),)
+-include make/rel/sub_ps/$(strip $(RELEASE_PACKAGE_SUB_PS)).mak
+endif
+endif
+
+# *************************************************************************
+# Custimization part: custom module setting
+# please add after the:# include make/rel/$(strip $(RELEASE_PACKAGE)).mak
+# *************************************************************************
+
+ 
+
+MediaTek Confidential . 2012 -2015 MediaTek Inc. Page 33 of 37
+This document contains information that is proprietary to MediaTek Inc.
+Unauthorized reproduction or disclosure of this information in whole or in part is strictly prohibited.
+
+ 
+
+MOLY Make/Build Environment
+and Procedures Design Document
+COMPLIST += xyz
+CUS_REL_SRC_COMP += xyz
+MOLY Make/Build Environment
+and Procedures Design Document
+COMPLIST += xyz
+CUS_REL_SRC_COMP += xyz
+
+endif
+
+2.
+Add a module makefile to “make/module/$(category)” directory. Please check the section “3.3
+Module Configuration Files” for creating xyz.mak makefile.
+7.1.2 Remove a Source Module
+1.
+Remove module from COMPLIST and CUS_REL_SRC_COMP in
+make/$(CUSTOM)_$(PROJECT)($(FLAVOR)).mak.
+For example “xyz”.
+7.1.3 Move a Source Module to a .lib Module
+1.
+Remove the module, for example “xyz”, from COMPLIST and CUS_REL_SRC_COMP.
+2.
+Add the module, for example “xyz”, to CUS_REL_MTK_COMP.
+3.
+Copy mcu/build/MT6280_R7R8_HSPA/FULL_VERSION/lib/xyz.lib to
+mcu/mtk_rel/MT6280_R7R8_HSPA/FULL_VERSION/lib, even if the xyz.lib already exists in
+mcu/mtk_rel/MT6280_R7R8_HSPA/FULL_VERSION/lib.
+4.
+Delete the module makefile from “make/module/$(category)/$(module).mak”.
+MediaTek Confidential . 2012 -2015 MediaTek Inc.
+Page 34 of 37
+
+This document contains information that is proprietary to MediaTek Inc.
+Unauthorized reproduction or disclosure of this information in whole or in part is strictly prohibited.
+
+ 
+
+# *************************************************************************
+# Custimization part: custom module setting
+# please add after the:# include make/rel/$(strip $(RELEASE_PACKAGE)).mak
+# *************************************************************************
+
+ 
+
+ifeq ($(strip $(CUSTOM_RELEASE)),TRUE)
+COMPLIST += abc xyz
+CUS_REL_SRC_COMP += abc xyz
+
+endif
+
+# *************************************************************************
+
+#
+Custimization part: custom module setting
+
+#
+please add after the:# include make/rel/$(strip $(RELEASE_PACKAGE)).mak
+
+# *************************************************************************
+
+ifeq ($(strip $(CUSTOM_RELEASE)),TRUE)
+COMPLIST += abc xyz
+CUS_REL_SRC_COMP += abc xyz
+CUS_REL_MTK_COMP += xyz
+
+endif
+
+g++-4.4 √
+-4.4-multilib √
+g++-4.4 √
+-4.4-multilib √
+g++-4.4-multilib √
+GNU make (3.81) √
+MOLY Make/Build Environment
+and Procedures Design Document
+Appendix1 Install Software and Compilation Tool Chain
+
+ 
+
+This chapter describes the standard procedure to install software and compilation tool chain for MOLY.
+The main required packages & recommend installation way as follows.
+
+Built-In Apt-get Others
+
+gcc-multilib
+
+√
+
+ 
+
+g++-multilib
+
+√
+
+ 
+
+perl (5.10.1)
+
+√
+
+ 
+
+arm-none-eabi-gcc-4.6.2
+
+√
+
+MediaTek Confidential . 2012 -2015 MediaTek Inc. Page 35 of 37
+This document contains information that is proprietary to MediaTek Inc.
+Unauthorized reproduction or disclosure of this information in whole or in part is strictly prohibited.
+
+ 
+
+root@z200:~# apt-get update
+Make/Build Environment
+and Procedures Design Document
+root@z200:~# apt-get update
+Make/Build Environment
+and Procedures Design Document
+1 Install build relative packages
+
+ 
+
+1. Login As your account name
+2. Make your Ubuntu has ability to go on internet
+3. Applications .
+Accessories .
+Terminal .
+Run sudo su .
+apt-get update
+4. Update apt information
+$sudo su [
+sudo] password for android:******
+
+ 
+
+5. Install packages
+# aptitude install -y bison
+# aptitude install -y g++-4.4
+# aptitude install -y g++-4.4-multilib
+# aptitude install -y gcc-4.1-multilib
+# aptitude install -y gcc-4.4-multilib
+# aptitude install -y gcc-multilib
+# aptitude install -y m4
+# aptitude install -y vim
+# aptitude install -y vim-runtime
+# aptitude install -y system-config-kickstart
+# aptitude install -y nmon
+# aptitude install -y ethtool
+# aptitude install -y tofrodos
+# apt-get -y install libxml-simple-perl perl-doc libwww-perl libfile-spec-perl
+
+6. Change default sh soft link to bash
+# rm /bin/sh
+# ln -s /bin/bash /bin/sh
+
+MediaTek Confidential . 2012 -2015 MediaTek Inc. Page 36 of 37
+This document contains information that is proprietary to MediaTek Inc.
+Unauthorized reproduction or disclosure of this information in whole or in part is strictly prohibited.
+
+ 
+
+MOLY Make/Build Environment
+and Procedures Design Document
+MOLY Make/Build Environment
+and Procedures Design Document
+2
+
+ 
+
+If you would like to get the file, please contact the software PM and then you can find this file by
+FES (MEDIATEK File Exchange System). This file is governed by the terms of the GNU General
+Public License, you can refer to the http://www.linaro.org for more detail information.
+
+ 
+
+2.1 arm-none-eabi-gcc-4.6.2 Web Site
+Main URL of arm-none-eabi-gcc-4.6.2 is http://www.linaro.org
+
+2.2 GCC Installation Procedure
+Step 1: Please extract “gcc.tar.gz”.
+
+Step 2: Please copy GCC folder to tools/GCC/4.6.2/linux folder in MOLY code base. For
+example, the “bin” folder in gcc.tar.gz will be placed tools/GCC/4.6.2/linux/bin
+
+MediaTek Confidential . 2012 -2015 MediaTek Inc. Page 37 of 37
+
+This document contains information that is proprietary to MediaTek Inc.
+Unauthorized reproduction or disclosure of this information in whole or in part is strictly prohibited.
+
+ 
