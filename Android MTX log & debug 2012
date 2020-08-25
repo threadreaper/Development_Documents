@@ -1,0 +1,1144 @@
+Android mtk log&debug
+Copyright . MediaTek Inc. All rights reserved.
+Android mtk log&debug
+2012/08/13
+MTK Support
+MEDIATEK CONFIDENTIALFOR yuqing.zhang@ ck-telecom.com USE
+2012/8/30 Copyright . MediaTek Inc. All rights reserved 1
+Outline
+.MTK Log Overview
+.MTK logging tool
+–Target side
+.Mobilelog logger
+.Modemlog logger
+.Network Diagnose Tool
+–PC side
+.GAT
+–GDB
+–Ftrace
+.Cachter
+.Hyper terminal tool
+.抓取eService Log
+.NE
+–Gnu toolchainMEDIATEK CONFIDENTIALFOR yuqing.zhang@ ck-telecom.com USE
+2012/8/30 Copyright . MediaTek Inc. All rights reserved 2
+Android log system overview (1/2)
+MEDIATEK CONFIDENTIALFOR yuqing.zhang@ ck-telecom.com USE
+2012/8/30 Copyright . MediaTek Inc. All rights reserved 3
+Android log system overview (2/2)
+.Logger device and kernel buffer
+–Character device
+–Buffer size and meaning
+.Main (64KB in previous/128KB in MTK, 256KB in android3.0)
+–Main application log
+.Events (128KB in previous, 256KB in android3.0)
+–System event information
+.Radio (64KB in previous, 256KB in android3.0)
+–Radio and phone-related information
+.System (64KB in previous, 256KB in android3.0)
+–Low-level system messages and debuggingMEDIATEK CONFIDENTIALFOR yuqing.zhang@ ck-telecom.com USE
+2012/8/30 Copyright . MediaTek Inc. All rights reserved 4
+MTK log system overview
+.Android Log
+–Android java layer log and native layer log
+.Kernel Log
+–Linux kernel log for kernel layer and drivers
+.Catcher Log
+–Modem log and use this tool to modify IMEI
+.Exception Database
+–System/exception info when fatal(kernel exception and system
+server exception)occur
+.Kernel Panic Log
+–The log for kernel panic/oopsMEDIATEK CONFIDENTIALFOR yuqing.zhang@ ck-telecom.com USE
+2012/8/30 Copyright . MediaTek Inc. All rights reserved 5
+AEE Introduction (1/2)
+.What is AEE?
+–Android Exception Engine (AEE) Feature is an exception catching
+and debugging information generation mechanism.
+.Basic terminology & definition
+–Exceptions are typically used to signal that something went wrong
+or abnormal (e.g. a division by zero occurred, memory access
+violation, undefined instruction). We consider those exceptions
+crashing the system
+.DB position
+–mnt/sdcard/mtklog/aee_exp (sdcard is mounted)
+–data/aee_exp (sdcard is unmount)
+.View DB
+–GAT log viewMEDIATEK CONFIDENTIALFOR yuqing.zhang@ ck-telecom.com USE
+AEE Introduction (2/2)
+JEMEDIATEK CONFIDENTIALFOR yuqing.zhang@ ck-telecom.com USE AEE Introduction (2/2)
+JEMEDIATEK CONFIDENTIALFOR yuqing.zhang@ ck-telecom.com USE
+
+AEE
+Java Exception
+Native Exception
+Kernel Exception
+Kernel Panic
+Memory usage
+analysis &
+debugging
+Performance
+bugs analysis &
+debugging
+Debugger
+External Exception
+NE
+KE
+Exception Handling
+Analysis & Debugging Mechanisms/Tools
+Copyright . MediaTek Inc. All rights reserved. 2012/8/30 6
+
+2012/8/30 Copyright . MediaTek Inc. All rights reserved 7
+Outline
+.MTK Log Overview
+.MTK logging tool
+–Target side
+.Mobilelog logger
+.Modemlog logger
+.Network Diagnose Tool
+–PC side
+.GAT
+–GDB
+–Ftrace
+.Cachter
+.Hyper terminal tool
+.抓取eService Log
+.NE
+–Gnu toolchainMEDIATEK CONFIDENTIALFOR yuqing.zhang@ ck-telecom.com USE
+2012/8/30 Copyright . MediaTek Inc. All rights reserved 8
+Android Logging Tool
+.Target side (System log tool)
+–Mobilelog logger (Built-in Engineer Mode)
+.Apk on target, dump android log and kernel log to NAND or SD card(default) on target
+–Modemlog logger (Built-in Engineer Mode)
+.Apk on target, dump modem log to SD card(default) or send to PC side via USB port
+.PC side
+–GAT(GUI-based debug info Analyzer Tool)
+.PC side tool, dump android log and kernel log to PC side via USB port
+–Catcher
+.PC side tool, dump modem log to PC side via USB port
+–Hyper terminal tool
+.Get Linux kernel log via UART4 port
+仅GB版本可保持在手机上
+Android Log
+kernel
+Panic Log
+Modem Log
+Exception DB
+GAT
+Mobile Log
+Modem Log
+Catcher
+Hyper terminal
+MEDIATEK CONFIDENTIALFOR yuqing.zhang@ ck-telecom.com USE
+Inc. 9
+System logging Tool
+. Enter engineer mode by dialing *#*#3646633#*#*” .SystemLog
+. Systemlog .Common UI
+-Quick switch log (modem log, mobile log, network test)
+input in the dialing interface,
+select "SystemLog"
+Network operation Logo
+Modem log operation logo
+Mobile log operation logo
+drop down
+click
+MEDIATEK CONFIDENTIALFOR yuqing.zhang@ ck-telecom.com USE
+Mobilelog logger (1/2)
+.
+SystemLog.
+Mobile log
+.
+This is a tool which could get AP
+Log(Main/Radio/ BT/Event/Kernel log)
+. Steps of start the mobile log ICS version can only be saved on the SD card
+–
+The default position=mnt/sdcard/mtklog/mobilelog
+. /Data/mobilelog
+–
+Type the log size, default is 300MB (The total log size)
+–
+Configure or disable auto run
+–
+Click the start button
+.
+Then you can leave the process and it will run on background
+.
+Notifications on the top bar indicate the status of mobile log
+Mobile log运行标志
+.
+Which kind of Log we should not use MobileLog?
+–
+In fact, any tool has its limitations, there are some cases which they
+can not record logs
+Phone hang
+
+Can record nothing
+
+Copyright .
+
+Suspend log
+
+Can.t record suspend log
+
+Depends the up the Log at The ON the Boot Number The of logs, IT May Loose at The Beginning log
+Shutdown the Log Can.t the Record All the shutdown log
+UMS Can.t Work at The Mounted sdcard IF IS Used to Store the Log
+MobileLog
+stop to clear the log, is strongly
+proposed in Clear log before verifying the problem
+
+2012/8/30 Copyright. MediaTek Inc. All rights reserved 11
+Mobilelog logger (2/2)
+. User build cannot grab the kernel log via usb
+. When the kernel fails to restart, the kernel panic log cannot be obtained
+. Time for different types of logs Inconsistent stamps?
+-The timestamps at the beginning of the log are inconsistent (MobileLog use a rotate mechanism. The oldest Log might be overwrite
+by new arrived)
+. To control the Log size, Log files recorded by MobileLog are limited to 5 files at maximum, and the
+size of each file is computed by total size and how many Log type should be record
+. If one log file reach its size, then rename it to “*.1”, and original “*.1” turn to “*.2”, and so on. The
+original “*.4” will be deleted
+– the timestamp at the end of the log is inconsistent (the last log is lost)
+. It may be the case that user does not stop the tool, there are still some logs in buffer and did not
+flush to sdcard
+. “main_log.boot”和“main_log.4”时间戳差很大?
+– main_log.boot is a independent file which record the log during boot up, it will not be overwritten
+like main_log.4
+.如何知道log已经停止录制?
+– If the user did not stop MobileLog and pull log directly, the size of all *_log will seem to be 1KB or
+very close to the integer multiples of 64KB, which is the buffer size of MobileLog
+. Log有乱码?
+– This case may be happen if there suffer some Sdcard issues
+. Content of other files appear in log file
+. There a lot of wrong characters in log file (may be content of binary file or image)
+MEDIATEK CONFIDENTIALFOR yuqing.zhang@ ck-telecom.com USE 2012/8/30
+Copyright. MediaTek Inc. All rights reserved 12
+Modemlog logger (1/2).
+Modem Log is the Log generated by the Modem, which is the Cather
+Log in the FP
+– Modem log is a binary format log. It cannot be opened and viewed directly. It needs MTK
+'s catcher tool to view.
+It support 2 ways of logging: SD logging and USB
+logging
+–In SD logging mode, it records modem logs in SD card
+files
+–In USB logging mode, it relays modem logs to PC Catcher
+via USB connection
+.Steps of start the modem log
+–position=mnt/sdcard/mtklog/mdlog
+–Type the log size: 1GB/600MB/stop until sd full (The total
+log size)
+– Configure or disable auto run
+–Click the start button
+.Notifications on the top bar indicate the status of
+modem log .How
+to be in the idle state
+-enter the modem log, cancel the automatic startup after booting, and restart the phone.
+Users can open .dmp files by Catcher.
+Only in the idle state
+can the mode be switched to
+Modem log operation Logo
+Uart1 logging at 921600
+bps will be disabled
+6 types of logMEDIATEK CONFIDENTIALFOR yuqing.zhang@ ck-telecom.com USE 2012/8/30
+Copyright. MediaTek Inc. All rights reserved 13
+Modemlog logger (2/2)
+. Log folder
+– every time After powering on or after MDLogger pause and resume, a new folder will be opened
+– the reason for the large log size: the commonality of telephony problems. When problems are found, the time point for possible problems has been a long time, a typical
+case It is the problem of register network reject. When the network rejects, it may appear in the middle of the night. When you wake up in the morning and cannot register to the network
+, the LOG has already been flushed
+– Memory Dump
+. Name such as Memory_PS_2010_0916_171003.bin
+. After memory dump is done, a dialog will be popped up to inform users that memory dump is finished (Click “OK” would
+reset Modem and MDLogger)
+. Recycling
+– MDLogger will check current every 30 seconds size
+. If the remaining space is less than 5MB, the log deletion mechanism will be activated
+. The standard for each log deletion is to clear the space greater than 10MB
+. Priority is to delete all non-Modem log Folders -> delete the Folder without EE (but if the bin file will Keep the db files needed by bin and catcher) -> delete
+some log files in the recorded folder (will be retained) -> delete EE (keep db and bin) -> delete EE folder
+-Note
+. Set 600M or 1G Mode, but if the SD Card memory is not enough free, the Modem tool will stop first when the
+SD Card is full, and the Modem Log will not be deleted because the SD Card is full
+. Filter file
+– Modem need a filter file to output specific log:
+. So “catcher_filter.bin” (the generation method will be introduced later) is must for SD mode
+– ModemLog will search the filter file in the following path in order:
+. /sdcard/mtklog/mdlog/catcher_filter.bin
+. /system/etc/firmware/catcher_filter.bin (default in load)
+– Set custom filter
+. push the filter file into the folder: /sdcard/mtklog/mdlog/
+. Please reboot the target if catcher_filter.bin is updated by adb pushMEDIATEK CONFIDENTIALFOR yuqing.zhang@ ck-telecom.com USE
+2012/8/30 Copyright . MediaTek Inc. All rights reserved 14
+Network Diagnose Tool
+. Objective
+– Since many networking issues are difficult to reproduce. When the issue happens, This
+tool can get enough networking information for resolving networking issue
+. This tool can get so many networking information
+– Networking information in proc folder
+– NIC information
+– the default routing and dns server
+– tcpdump Log
+– ping Log
+. Log position
+– mnt/sdcard/mtklog/netlog
+. This UI as shown:
+– This tool .s main functions divided into 5 parts:
+. Start tcpdump
+. Stop tcpdump
+. Run shell command
+. Stop running shell command
+. Clear log
+It will cost long time after you stop the tool，
+because the tool will auto full test , so Please wait.
+MEDIATEK CONFIDENTIALFOR yuqing.zhang@ ck-telecom.com USE
+2012/8/30 Copyright . MediaTek Inc. All rights reserved 15
+Log tool customization
+.Path: mediatek/source/external/xlog/tools
+–mtklog-config-eng.prop is for eng build
+–mtklog-config-user.prop is for user build
+.Content of mtk-config-<eng/user>.prop
+–mobile for MobileLog/modem for ModemLog/net for NetLog
+–persist.sys.log2sd.defaultpath
+.Default path for Log, eg, /data, /mnt/sdcard or /mnt/sdcard2
+–com.mediatek.log.<mobile/modem/net>.enable
+.If the tool should auto-start after first download
+–com.mediatek.log.<mobile/modem/net>.maxsize (Unit: MB)
+.Log Tool will set log size as default value if you set it as 0
+–MobileLog:300/ModemLog:600/NetLog:200MEDIATEK CONFIDENTIALFOR yuqing.zhang@ ck-telecom.com USE
+Get Logs out of SD-Card
+.Log path
+–Mobile log tool: mnt/sdcard/mtklog/mobilelog
+–Modem log tool: mnt/sdcard/mtklog/mdlog
+–Net log tool: mnt/sdcard/mtklog/netlog
+–AEE DB: mnt/sdcard/mtklog/aee_exp (sdcard is mounted)
+–AEE DB: data/aee_exp(sdcard is unmount)
+.There are 3 ways for you to pull logs from SD-Card to PC, and the following 3 pages will tell you some
+details
+–Mount to PC(UMS) and run copy/paste
+–Through adb pull commond
+–Through file explorer in DDMS/GAT
+.Mount to PC and run copy/paste
+–UMS (USB Mass Storage)
+.This way is safe but should notice the limitation of Log tool (做UMS时无法抓取log).
+–MTP (Media Transfer Protocol) (Do not use this!)
+.This way is not safe because there is a big file sync issue
+–happen
+–
+–with
+Before this，
+please stopped
+log tool first！
+Tool can detect
+this error and
+show messagesMEDIATEK CONFIDENTIALFOR yuqing.zhang@ ck-telecom.com USE
+2012/8/30 Copyright . MediaTek Inc. All rights reserved 17
+GAT
+.Overview
+.Main UI
+.Mediatek Extended functionality
+–Online part
+.Log Recorder
+.Process Information
+.Debug Configuration Setting
+.DB Puller
+.Profile
+–Cpu time
+–App launch
+–ftrace
+–Offline part
+.Logview
+.FAQMEDIATEK CONFIDENTIALFOR yuqing.zhang@ ck-telecom.com USE
+2012/8/30 Copyright . MediaTek Inc. All rights reserved 18
+Overview
+.GAT is a GUI-based debug info analyzer (designed by Mediatek)
+and provides a GUI that all utilities are integrated into for improving
+efficiency of development and debugging
+–Base on DDMS UI and add more features for debugging more effectively.
+–Can diagnose whole system status automatically and help QA/RD to
+figure out owner(Expert System)
+–Support windows and linux
+GAT online part
+Android/kernel log
+recorder
+Support ALE XLOG Setting
+Debug
+Debug
+Configurati
+on
+adb window
+Process
+Information
+Thread
+Back trace
+Puller
+DB Puller
+GAT offline part
+Log View Diagnose Script Plug in
+Autodiagnose.j
+ar
+Backtrace.py
+MEDIATEK CONFIDENTIALFOR yuqing.zhang@ ck-telecom.com USE
+2012/8/30 Copyright . MediaTek Inc. All rights reserved 19
+Main UI -GAT
+.GUI-based debug info analyzer
+点击打开cmd，
+一般用于adb命令
+MEDIATEK CONFIDENTIALFOR yuqing.zhang@ ck-telecom.com USE
+Log Recorder (1/4)
+2012/8/30 Copyright . MediaTek Inc. All rights reserved. 20
+. Get kernel log and android log via USB port or UART port
+and can save to PC
+– Support ALE feature
+– Support XLOG Setting
+. Android Log
+. Kernel Log
+– Get the kernel log via USB
+– Get the kernel log via UART
+. Step by step
+– Choose RIGHT COM port for your device
+– Click “UART” button
+. Note
+– Log level is invalid because Linux kernel doesn.t output kernel log level by default.
+– Note: this UART kernel log is only supported for windows OS
+Codebase没有开启MEDIATEK CONFIDENTIALFOR yuqing.zhang@ ck-telecom.com USE
+Log Recorder (2/4)
+.Save log
+2012/8/30 Copyright . MediaTek Inc. All rights reserved. 21
+点击保存log
+点击保存logMEDIATEK CONFIDENTIALFOR yuqing.zhang@ ck-telecom.com USE
+Log Recorder (3/4)
+2012/8/30 Copyright . MediaTek Inc. All rights reserved. 22
+.Add DDMS Filter
+.XLog Filter
+–Logs filtered by xlog will
+never appear in android log
+buffer, which means xlog is a
+pre-filter.
+–Logs filtered by DDMS are
+still in log buffer while does
+not be shown. DDMS is a
+post-filter
+点击添加
+随便取一个名字
+选择过滤条件
+MEDIATEK CONFIDENTIALFOR yuqing.zhang@ ck-telecom.com USE
+Log Recorder (4/4)
+也可以用adb shell配置xlog
+MEDIATEK CONFIDENTIALFOR yuqing.zhang@ ck-telecom.com USE
+Process Information
+. “Process” Panel
+Copyrigh
+Before click “Backtrace”,
+set symbol path
+include following parts:
+a. basic information of process
+b. kernel space back trace
+c. native layer back trace. This item
+does not exist for kernel threads.
+d. java layer back trace. This item
+does not exist for non java processes.
+MEDIATEK CONFIDENTIALFOR yuqing.zhang@ ck-telecom.com USE
+GDB Debug
+.右击进程
+.设置symbols和
+source路径
+.程序自动通过adb
+连接，启动gdb
+debug对应的进
+程
+2012/8/30 Copyright . MediaTek Inc. All rights reserved. 25MEDIATEK CONFIDENTIALFOR yuqing.zhang@ ck-telecom.com USE
+GDB manual setup
+. Debug the program
+– On the device, launch a new command
+. #gdbserver :1234 /system/bin/<executable>
+– or attach to an existing process
+. #gdbserver :1234 –attach <pid>
+. On the host, forward port to the device with adb
+– #adb forward tcp:1234 tcp:1234
+. Connect to target
+– cd alps/
+– file ./out/target/product/$project/symbols/system/bin/xxx
+– set solib-search-
+path ./out/target/product/$project/symbols/system/lib
+– set solib-absolute-prefix ./out/target/product/$project/symbols
+– target remote:1234
+2012/8/30 Copyright . MediaTek Inc. All rights reserved. 26
+adb shell
+You can use “ps” command to
+find out the process ID
+The version of arm-eabi-gdb*
+and gdbserver must matchMEDIATEK CONFIDENTIALFOR yuqing.zhang@ ck-telecom.com USE
+GDB command
+GDB command
+.
+– http://sourceware.org/gdb/current/onlinedocs/gdb/
+– UI gdb debugger: http://www.gnu.org/software/ddd
+Command Abbreviation Description
+attach at Attaches to a running process You can use gdb
+command “help
+backtrace bt Prints a stack trace [command] if you want
+break b Sets a break point to know how to use itcontinue c Allows the program to continue executing
+delete Clears a break point by number
+
+detach
+
+Detaches from the currently attached process
+
+display
+
+Displays the value of an expression every time execution stops
+
+finish
+
+Runs to the end of the function and displays return values of that function
+
+jump
+
+Jumps to an address and continues the execution there
+
+listl
+
+l
+
+Lists the next 10 lines
+
+next
+
+n
+
+Steps to the next machine language instruction
+
+print
+
+p
+
+Prints the value of an expression
+
+run
+
+r
+
+Runs the current program from the start
+Changes the value of a variable
+
+Copyright . set
+step
+
+s
+
+Steps the program instruction by instruction
+
+MTK bug report
+.will produce a zip file
+(mtk_bugreport_xxxxxx_xxxxxx.zip) in the Temp
+directory
+.This zip file is used to the Mediatek feedback bugs.
+2012/8/30 Copyright . MediaTek Inc. All rights reserved. 28
+一次性将手机里的log捞
+出，方便客户提供debug
+资料给MTKMEDIATEK CONFIDENTIALFOR yuqing.zhang@ ck-telecom.com USE
+Debug Configuration Setting
+2012/8/30 Copyright . MediaTek Inc. All rights reserved. 29
+.Feature
+–Clear AEE DB
+.Android Exception Engine: an exception catching and debugging
+information generation mechanism.
+.Db folder:
+–sdcard\mtklog\aee_exp
+–data\aee_exp (if sdcard is not Available)
+–Manual Dump DB
+–Clear Red ScreenMEDIATEK CONFIDENTIALFOR yuqing.zhang@ ck-telecom.com USE
+DB puller
+2012 Copyright . MediaTek Inc. All rights reserved.
+.Feature
+–Can list db files in phone and SD card and pull these to PC
+(and launch GAT offline part)
+Offline logview稍后会讲
+用此工具解开DBMEDIATEK CONFIDENTIALFOR yuqing.zhang@ ck-telecom.com USE
+Profile
+.If you want to use this feature, it is recommended that
+click the below button to save the target CPU time.
+.Profile feature (only eng build)
+–CPU time
+–APP Launch
+2012/8/30 Copyright . MediaTek Inc. All rights reserved. 31MEDIATEK CONFIDENTIALFOR yuqing.zhang@ ck-telecom.com USE
+CPU time (1/2)
+.Manual mode
+.Auto mode
+201Copyright . MediaTek Inc. All rights reserved.
+MEDIATEK CONFIDENTIALFOR yuqing.zhang@ ck-telecom.com USE
+CPU time (2/2)
+. adb shell cputime [……]
+– e.g.
+. cputime –e 100 // enable cputime monitor, and stop after 100 seconds. Then show process
+cputime.
+. cputime -start // start the CPU time monitor.
+. cputime –stop // stop the CPU time monitor and show result
+. cputime –e 300 –m 10 // start cputime monitor about 300 seconds. Show top 10 thread
+. cputime –m 10 –p // show top 10 process
+. cputime –m 5 –s isr_c // show top 5 isr count
+– Arg
+. -start start cpu time monitor.
+. -stop stop cpu time monitor.
+. -n num updates to show before exiting.
+. -d num seconds to wait between updates.
+. -m num Maximum number of information to display.
+. -e num Enable CPU time monitor and stop monitor after “time” seconds. If no this parameter will show
+last cputime monitor data.
+. -p show process instead of thread. If no this parameter default will show thread information.
+. -s col column to sort by time/user/kernel/id/isr_c/isr_t(cputime /user time/kernel
+time/id/isr_count/isr_time), If no this parameter default will sort by cputime.
+. -i id show sir information of thread id.
+cputime –m 5 –s isr_cMEDIATEK CONFIDENTIALFOR yuqing.zhang@ ck-telecom.com USE
+APP Launch
+. If you have done “Enable APP launch” on one device,
+the menu will be disable. Or you need first do this, then
+the phone will reboot.
+2012/8/30 ediaTek Inc. All rights reserved. 34 is
+ready to enter For the app interface, for
+example, you need to measure the startup
+process of the setting . When you are ready, press OK
+. When you enter the screen, press
+OK to stop measuring
+Logged by
+cputime
+Logged by
+ftraceMEDIATEK CONFIDENTIALFOR yuqing.zhang@ ck-telecom.com USE
+Ftrace –Kernel Function Tracer
+. Used to trace the kernel function at beginning
+– It.s now an infrastructure that can be used for debugging or
+analyzing latencies and performance issues in the kernel
+. What this tool can help?
+– Tracing kernel function, timing, context switch, interrupt latency,
+events etc…
+. Ftrace is framework for different tracers
+– Auto inserted by compiler: Uses gcc .-pg. option
+– Inserts call to .mcount. in each function prologue
+. ARM platform implement in <arch/arm/kernel/entry-common.S>
+. mcount must be called with a consistent stack frame and frame pointer. You can.t use “-fomit-
+frame-pointers“ compiler option on ARM
+– Compiler disables some optimizations automatically
+– Can be used for debugging and profiling system behavior
+. What.s the limitation?
+– Enable it will add system overhead
+– Basically, it.s a debugging tool, not a monitoring tool
+2012/8/30 Copyright . MediaTek Inc. All rights reserved. 35MEDIATEK CONFIDENTIALFOR yuqing.zhang@ ck-telecom.com USE
+Usage Scenario
+. Ftrace has many tracers
+– The most used “sched_switch“ tracer is default enabled on alps 2.3 (engineer mode)
+. The “sched_switch“ tracer can be used for system behavior and performance
+issue analysis
+. Some possible scenario:
+– Boot time analysis
+– APP launch time analysis
+– User scenario analysis
+– Use the “sched_switch“ tracer to see the process flow based on time, and check if any
+thing is blocked or taking too long to complete
+. Start tracing
+– adb shell “echo nop > /sys/kernel/debug/tracing/current_tracer“
+– adb shell “echo 8192 > sys/kernel/debug/tracing/buffer_size_kb”
+– adb shell “echo sched_switch > /sys/kernel/debug/tracing/current_tracer”
+– adb shell “echo 1 > /sys/kernel/debug/tracing/tracing_enabled”
+. Stop tracing and get the trace data
+– adb shell “echo 0 > /sys/kernel/debug/tracing/tracing_enabled”
+– adb pull /sys/kernel/debug/tracing/trace .
+2012/8/30 Copyright . MediaTek Inc. All rights reserved. 36
+修改buffer szie
+开始trace
+切换为sched_switch tracer
+切换为sched_switch tracer
+停止traceMEDIATEK CONFIDENTIALFOR yuqing.zhang@ ck-telecom.com USE
+Output Format
+.The format
+–Context switches:
+.Previous task Next Task
+.<pid>:<prio>:<state> ==> <pid>:<prio>:<state>
+–Wake ups:
+.Current task Task waking up
+.<pid>:<prio>:<state> + <pid>:<prio>:<state>
+.<prio> is the internal kernel priority
+–Kernel priority: 0 to 99 => user RT priority 99 to 0
+–Kernel priority: 100 to 139 => user nice -20 to 19
+–Kernel priority: 140 => idle task priority
+.<state>
+–R –running : wants to run, may not actually be running
+–S –sleep : process is waiting to be woken up (handles signals)
+–D -disk sleep (uninterruptible sleep) : process must be woken up
+–T –stopped: process suspended
+–t -traced : process is being traced (with something like gdb)
+–Z –zombie : process waiting to be cleaned up
+2012/8/30 Copyright . MediaTek Inc. All rights reserved. 37MEDIATEK CONFIDENTIALFOR yuqing.zhang@ ck-telecom.com USE
+LogView
+2012/8/30 Copyright . MediaTek Inc. All rights reserved. 38
+.How do you check the AEE db?
+.How do you check the android log?
+–UltraEditor、Source Insight、vi、
+emacs
+.LogView
+–android log & kernel log timestamp
+sync
+.Plug-in Script
+–Backtrace decoder script
+–Diagnose script
+.Key feature
+–Drop open AEE DB
+.Backtrace decoder
+–Drop open mtklog folder
+–Drop open mobilelog folder
+.View feels like DDMS
+.Sync main/events/radio log
+.Drop the DB file to GAT
+–The offline of GAT will be open
+–The DB file will be decrypted automaticMEDIATEK CONFIDENTIALFOR yuqing.zhang@ ck-telecom.com USE
+Drop *.dbg/mtklog/mobilelog
+1
+2MEDIATEK CONFIDENTIALFOR yuqing.zhang@ ck-telecom.com USE
+AEE parsing Plug-in
+. Running Plug-in after extract DB
+– Support jar/exe/bat/py/pyc (Built In Python2.7.2 runtime)
+. Installation
+– .\gat-win32-2.0\plugin-scripts
+. Plug-in command line parameters
+– Extracted DB path
+– Parser output file path
+– Symbol Path (default is “null”)
+MEDIATEK CONFIDENTIALFOR yuqing.zhang@ ck-telecom.com USE
+Tips
+.Auto Integrate
+–main_log.1
+–Main_log
+.Open
+–by UltraEdit-32
+–Containing Folder
+.Text Editor
+–Show Line Numbers
+–Find as Eclipse
+.Support regular exp
+–New Editor
+.View layout
+–Reset layoutMEDIATEK CONFIDENTIALFOR yuqing.zhang@ ck-telecom.com USE
+GAT FAQ
+GAT
+GAT FAQ
+GAT
+–
+In fact, any tool has its limitations, so do GAT, there are some cases
+which they can not record logs
+. GAT抓不到任何log
+–
+If you use GAT to record log, please kindly remember to click the device
+line in “DDMS control” panel, or you will record nothing
+.同时使用GAT/mobile log会丢失大部分kernel log
+–
+do not use MobileLog and GAT(via USB mode) together! Or you will find
+logs are divided by the two tools
+.
+MobileLog and GAT are both get Kernel Log through reading /proc/kmsg, which
+is only support one reader
+.
+GAT documentation -Release
+with flash tools
+-Search on DCC: GAT_User_Guide(Customer).docx
+.
+Ftrace documentation
+-Search on DCC: Ftrace_user_guide.pptx
+. Log
+PhonehangCanrecordnothing except you use
+UART4mode
+
+Boot up Log It begin to record after adb is ready, it
+will loose the beginning
+Shutdown Log Cannot record all shutdown log
+UMS Can record Logs
+Click here to select mode: via UART or USB
+Copyright . MediaTek Inc. All rights reserved 2012/8/30 42
+
+Catcher
+ADB
+Relayer
+Catcher
+L1
+PS
+Command
+Target
+Socket
+Shared Memory PCMEDIATEK CONFIDENTIALFOR yuqing.zhang@ ck-telecom.com USE Catcher
+ADB
+Relayer
+Catcher
+L1
+PS
+Command
+Target
+Socket
+Shared Memory PCMEDIATEK CONFIDENTIALFOR yuqing.zhang@ ck-telecom.com USE . For USB Logging, you need Catcher
+. Select “USB Logging Mode” and then click “Start”
+Copyright . MediaTek Inc. All rights reserved
+
+ 
+
+2012/8/30
+Connect to PC
+.Cather: Enter Logging Mode
+.ADB Relayer : Connect to target (auto connect when step 4)
+.After connecting to target, users can set filter from Catcher
+and see logs shown on Catcher views
+1. Enter Logging Mode
+2. Set MD Database path
+3. Set Connection Mode : Smart Phone Logging
+4. Connect, then the ADB Relayer will popup
+Database路径
+MEDIATEK CONFIDENTIALFOR yuqing.zhang@ ck-telecom.com USE
+Copyrigh 45
+Generate catcher_filter.bin
+. Use Catcher to generate catcher_filter.bin
+– Enter logging mode, set DB
+– Press “Connect”
+– Press “Filter” -> select filter -> Export
+– Choose “Export to *.bin”, then click OK.
+. Put catcher_filter.bin into sdcard/mtklog/mdlog/catcher_filter.bin
+– Adb push
+– Please reboot the target if catcher_filter.bin is updated by adb pushMEDIATEK CONFIDENTIALFOR yuqing.zhang@ ck-telecom.com USE
+2012/8/30 Copyright . MediaTek Inc. All rights reserved 46
+Open *.dmp file on catcher
+.Select the database
+–Config->Set Database Path
+.Get into the logging mode
+–Controls->Mode->Logging
+.Open the dump file
+–Controls->Open dump FileMEDIATEK CONFIDENTIALFOR yuqing.zhang@ ck-telecom.com USE
+Inc.
+Hyper Terminal
+. mt6577默认关闭UART console (log太多)
+–开机log到xlog启动前还是有uart log,之后才关闭
+–Open method: adb shell aee –k 8.
+Step
+– Connect the device.s UART4 to PC with UART4
+– Open Terminal server (Start> -Programs > -Accessories > -Communications > -Super Terminal
+)
+– set correct port and Baud rate as 921600
+– get and save log in terminal server
+just take a name
+MEDIATEK CONFIDENTIALFOR yuqing.zhang@ ck-telecom.com USE
+Copyrigh
+Log Tool Using Scenarios (1/2)
+.Mobile log tool and GAT use scenarios
+-from the following figure It can be seen that the mobile log tool (device) and GAT (PC) capture the same
+type of log. In short, because the mobile log is restricted by the system, it is impossible to capture
+the log of some abnormal occasions (such as the moment before Hang machine, non-android environment such as factory
+mode). In this case, GAT needs to be supplemented from the PC side –
+Mobile log tool The feature is that it runs on the mobile phone and is easy to use (press start to start
+), but the limitation is that the space of the mobile phone is limited –
+mobile log tool later added BTlog, GAT cannot catch Btlog. GAT
+additional functions
+
+-You can dump mobile log to PC -Offline analysis log and dbMEDIATEK CONFIDENTIALFOR yuqing.zhang@ ck-telecom.com USE
+Log Tool Using Scenarios (2/2) MEDIATEK CONFIDENTIALFOR yuqing.zhang@ ck-telecom.com USE Log Tool Using Scenarios (2/2) MEDIATEK CONFIDENTIALFOR yuqing.zhang@ ck-telecom.com USE ONLYCharacteristic When to Use
+SystemL
+og
+Mobile Log Tool
+(Device.
+1. The type of grabbing Log is comprehensive,
+AP/Modem/Network Log
+can be used
+2. Direct stored in the mobile terminal
+(SD Card), is not dependent on the
+PC and Cable, can be anywhere so Qing
+3.Andrdoid system normally makes a normal boot Qing
+4. generally for SD Card / EMMC have dependencies (if
+Log memory
+stored in SD Card/EMMC.
+1.Daily Use
+2.Free Test
+3. No PC/Cable can use
+Modem Log Tool
+(Device.
+Network Log
+Tool (Device.
+Hyper Terminal (PC. 1. PC
+side grabs Kernel Log, you can grab
+Log at any time)
+(Power on/off.
+BSP features basically require
+GAT (GUI-based Analyzer
+Tool) (PC.
+1 .Log Catch/Debug in one,
+RD/QA can make 甠
+2. The style is consistent with DDMS, which is convenient for palms.
+3. Exception DB Pull/Location function after
+finishing 4. PC-side tools, USB/Uart connection
+1. Special project Test
+2. PC/Cable available
+3. Catch Exception Info and
+Pull
+4. Analysis while grabbing Log
+5. You can also connect to UART4 to grab the kernel
+log (same as Hyper Terminal)
+Catcher Tool (PC.
+1. The tool is more stable, after a long time Use Verification
+2. Capture Log for Modem
+3. Easy to set Filter
+4. Both UART/USB can be
+connected to PC for Modem related tests
+
+ 
+
+2012/8/30 Copyright. MediaTek Inc. All rights reserved 50
+Outline
+.MTK Log Overview
+.MTK logging tool
+–Target side
+.Mobilelog logger
+.Modemlog logger
+.Network Diagnose Tool
+–PC side
+.GAT
+–GDB
+–Ftrace
+.Cachter
+.Hyper terminal Tool
+. grab the Log eService
+.NE
+- GNU toolchainMEDIATEK CONFIDENTIALFOR yuqing.zhang @ ck-telecom.com the USE
+grab the Log eService (1/3)
+.
+Please note that saved the corresponding out / target / product / $ project / symbols directory before verification And
+kernel/out/vmlinux, because these two are required by NE (native exception)/KE (kernel
+panic)
+.
+Turn on log
+-turn on Mobile Log
+. Clear the old log before turning it on, and set the maximum space to
+300M or greater, set to auto-start after power-on
+-If it is a test phone and data service related problem, please open the
+Modem log and Network Log
+.
+Clear the old log before opening it
+.
+Reproduce the operation
+-find the problem! ! !
+.
+Crash restart, the process is not responding (ANR), the process stops unexpectedly, can not call, Huaping, hang machine, the machine jammed,
+other issues
+-
+issues recorded Points
+
+ 
+
+.
+During the recording operation of / the way, there is a problem of time and place, a clear description of the problem scenarios, it can capture cross-sectional
+diagram, if the problem is difficult to describe, please record video
+.
+Several attempts to reproduce again, to see whether it is necessary now, if No, record the number of tests and the number of recurrences
+.
+Close log: Enter the corresponding interface to close the log according to the previously opened log method
+.
+Grab the log and key data
+-
+GAT bug report button capture
+(must be able to connect to adb)
+-
+save the picture on the right of the text into MTK_PULL_ALL.bat, and then double-grab
+(must be able to connect
+adb)
+
+ 
+
+Clear the old log, open the log
+user operation to reproduce the problem and record it
+Stop the log to
+capture the log and key data
+Copyright. MediaTek Inc. All rights reserved 2012/8/30 51
+
+2012/8/30 Copyright. MediaTek Inc. All rights reserved 52
+Grab eService Log (2/3)
+. Special case-
+T card does not exist or is not mounted (mobile log/modem log/network log cannot work normally at this time)
+.GAT capture log (must be able to connect to adb)
+.UART4 link, and then enter logcat -v time to capture log (for USB plug-in operation)
+. After finding the problem, capture the captured log and MTK_PULL_ALL.bat to capture the data Submit it together-
+Hang machine problem
+. Confirm Hang machine type
+-connect to the mobile phone through usb/uart4, if uart4 is pulled out, uart4 is best.
+Uart4: ps .USB
+: adb shell ps
+-if Uart4 has log spit out, the kernel is normal, if uart4/usb can perform command operations, that is, the upper screen hangs,
+otherwise the entire system hangs
+. The upper hang
+– first dumps the state of the system.
+adb shell dumpsys> dumpsys.txt
+.adb shell dumpstate> dumpstate.txt
+– Then use MTK_PULL_ALL.bat to capture the data and submit it together
+-the most important point is to insert the USB and keep the scene. Inserting the USB is for the phone to continue to power on, and the scene cannot be kept if it is out of power
+
+.The bottom layer of Hang live (77 has external WDT, so there will be no hang dead) – Submit the log captured by UART4 at the time. If not, please unplug the battery and restart after Hang live for 3 minutes (maybe the
+log is still recording) , And then use UART4 + main log to reproduce
+MEDIATEK CONFIDENTIALFOR yuqing.zhang@ ck-telecom.com USE 2012/8/30
+Copyright. MediaTek Inc. All rights reserved 53
+Grab eService Log (3/3)
+. Modem exception (EE occurred)
+– additional log required
+. Modem log (must be attached)
+– Catcher log & Modem database
+. Ex: MDLog_PS_2012_0106_231841.dmp
+. Placed in the mtklog/mdlog directory under sdcard
+. Ex: BPLGUInfoCustomAppSrcP_xxxx
+. General Place it in the mediatek/custom/common/modem/$modem directory (where $modem value is
+CUSTOM_MODEM in ProjectConfig.mk )-Memory
+dump bin & Modem ELF
+. Ex: Memory_PS_2012_0106_232402.bin
+Ex: xxx13_TD_PCB01_tdd128hspa_MT6573_S01.elf
+. In the build/xxx/ directory of the modem code package
+. It must be compiled and generated at the same time as the modem.img
+. Mobile(AP) log
+– Kernel log (Needed)
+– AEE db.xx log (Needed if without Kernel log)
+– Remainder
+. If you don.t know how to get modem ELF file, please refer to the latest
+MP_ReleaseNote_xxx.xls(build_configure_modem) which can be got from
+your S/W manager
+This is the database and
+this must be the modem code
+The ELF in the build directory of the package is
+generated by the same compilation. It is recommended to
+copy the ELF to this directory for problem analysis. Use
+MEDIATEK CONFIDENTIALFOR yuqing.zhang@ ck-telecom.com USE 2012/8/30
+Copyright. MediaTek Inc. All rights reserved 54
+Provide Log when exception
+①When do testing, suggest to attach the Video for issues which repeat ratio is Always/above 50%; Seldom/below
+50% issues, strongly suggest to attach videos if you can
+②When find a issue using multimedia file or application/tool, please make sure the related test material is
+attached
+③Modem/RIL related: Telephony features, e.g. GPRS, Call, SIM…/ Interrupt or concurrency with these featuresMEDIATEK CONFIDENTIALFOR yuqing.zhang@ ck-telecom.com USE
+2012/8/30 Copyright . MediaTek Inc. All rights reserved 55
+Outline
+.MTK Log Overview
+.MTK logging tool
+–Target side
+.Mobilelog logger
+.Modemlog logger
+.Network Diagnose Tool
+–PC side
+.GAT
+–GDB
+-Ftrace
+.Cachter
+.Hyper Terminal Tool
+. Grab the Log eService
+.NE
+- GNU toolchainMEDIATEK CONFIDENTIALFOR yuqing.zhang @ ck-telecom.com the USE
+2012/8/30 Copyright. MediaTek Inc. All Rights Reserved 56
+Gnu toolchain
+. Understanding and using gnu Toolchain can be more convenient when debugging
+. Tool directory: prebuilt/linux-x86/toolchain/arm-linux-
+androideabi-4.4.x/bin
+–Just for arm
+. Directory can be added to environment variables
+– tools can be used anywhere MEDIATEK CONFIDENTIALFOR yuqing.zhang@ ck-telecom.com USE 2012/8/30
+Copyright. MediaTek Inc. All rights reserved 57
+addr2line (1/2)
+.arm-linux-androideabi-addr2line [option(s)] [addr(s )]
+-Convert the address to the file and line number of the address (display the function)
+-Parameters (commonly used)
+.-e –exe=<executable>: Set the file to be queried (default: a.out)
+– generally *.so/*.a and executable program
+– this file must have debug information, in the android codebase It is placed in the
+out/target/product/$project/symbols directory
+. -f --functions: Display the function name where the address is located
+. -C --demangle[=style]: Demangle[=style]: Demangle[=style]: Demangle function name in readable mode
+-automatic format
+-C ++ function this parameter is required
+-help-H.
+- examples of
+.1
+.2
+.3
+after reforming function of
+a number of hard to read
+Mediatek CONFIDENTIALFOR yuqing.zhang @ ck-telecom.com the USE
+2012/8/30 Inc is an ediaTek . rights reserved
+addr2line (2/2)
+.arm-linux-androideabi-addr2line [option(s)] [addr(s)]
+– When do I need to use it? .After the
+application crashes (NE), it will generate the tombstones/tombstones_xx file
+or the __exp_main.txt after the db in aee_exp is unzipped, which contains the backtrace letter
+You can use addr2line to analyze which file, which line and which function (note that
+the file loaded with -e must be compiled and generated at the same time as the bin file of the mobile phone, otherwise the address and symbol may
+be inconsistent)
+. Addr2line is not necessary, You can also use trace32, or objdump -S
+$name> xx.txt to analyze (objdump will be introduced later)
+1. Click here
+2. Select CPU:
+75:A9,77:A9MPcore
+3. Select up
+4. Click here
+to load so
+Or program
+5. Click here
+6. Fill in the address
+7. Click here
+8. Which function can be seen in the status bar
+9. The blue number indicates which line
+of
+the file indicates that the file where this address is located is
+line 8 of test.c. The function is
+bbbbbMEDIATEK CONFIDENTIALFOR yuqing.zhang@ ck-telecom.com USE
+Copyright .MediaTek Inc. All
+objdump
+.arm-linux-androideabi-objdump.exe <option(s)> <file(s)> --View
+object file(* .so/*.a or application) content information
+-parameters (commonly used)
+. At least one of the following parameters is required
+---A, --archive-headers: display library (*.a) member information
+---f, --file-headers: display the overall header summary information of each file in obj
+---h, --[section-]headers: Display the header summary information of each section of the target file ---x, --all
+-headers: display all header summary information
+---d, --disassemble: disassemble code segments
+---D, --disassemble-all: disassemble all segments
+- -S, --source: disassemble the source code, additional debug information, implied -d, if compiling with -g, the effect is more obvious
+–-t, –syms: display symbol table
+–-r, –reloc: display Relocation record
+. -C, -demangle[=STYLE] The anti-reshape symbol is readable
+-automatically recognize the format
+. -H, -help -Example
+-
+Under what circumstances need to be used?
+. When NE occurs, get backtrace to view the assembly code of the corresponding address
+Address
+Instruction
+Corresponding code
+MEDIATEK CONFIDENTIALFOR yuqing.zhang@ ck-telecom.com USE 2012/8/30
+Copyright. MediaTek Inc. All rights reserved 60
+c++filt
+.arm-linux-androideabi-c++filt.exe <function name>
+– Anti -reshape C++ symbols into a readable way
+– parameters (commonly used)
+.-h, –help
+– Examples
+– Under what circumstances do they need to be used?
+After unlocking the db via GAT (input symbols directory), if it is NE, you can check
+whether the corresponding symbols of the unlocked C++ are the same as those of c++filt. If they are different, the
+symbols directory and the phone bin file do not match the
+following functions Does not match c++filt
+MEDIATEK CONFIDENTIALFOR yuqing.zhang@ ck-telecom.com USE 2012/8/30
+Copyright. MediaTek Inc. All rights reserved 61
+Reference
+.eCourse (http://online.mediatek.com)-please
+see Android _Debug_Basic video
+. Documentation (please search on DCC)
+--Logging_SOP_customer_MT6577.pptx
+--SmartPhone MobileLog user manual.docx
+--SmartPhone ModemLog user manual.ppt
+--Debugger_User Guide_MT6577_4.0.docx
+–System_Debugging_Customer_MT6577_4.0.docx
+–GAT_User_Guide(Customer).docx
+–Ftrace_user_guide.pptx
+–Catcher user manual
+.FAQ (http://online.mediatek.com)
+–请看SW/ALPS/下的System-Debugger，Debugging和Framework-
+Tool&DebugMEDIATEK CONFIDENTIALFOR yuqing.zhang@ ck-telecom.com USE
+Copyright . MediaTek Inc. All rights reserved.
+www.mediatek.comMEDIATEK CONFIDENTIALFOR yuqing.zhang@ ck-telecom.com USE
