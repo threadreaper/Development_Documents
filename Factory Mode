@@ -1,0 +1,30 @@
+MTK Documentation
+MTK Android manually turn off factory mode
+Admin / March 9, 2018
+
+[Key Words]
+factory mode, manually close
+
+ 
+
+[DESCRIPTION]
+In order to prevent end users from entering the factory mode due to misoperation during the use of mobile phones, the factory mode needs to be closed. However, the factory mode test must exist in the production line process. In this case, one needs to be turned on Or the "switch" to turn off the factory mode exists, and the factory mode can be controlled freely. Take 72 as an example, introduce using pro_info to store this "switch" mark, so that this mark can be accessed in LK/Uboot, and at the same time, the mark can be read and written through the nvram interface in the upper APK.
+
+[SOLUTION]
+1. To customize an nvram item, please refer to "customization inNvRAM.ppt" Note_1
+:
+a) If the platform uses [eMMC], the size of the new LID corresponding to the struct must be a multiple of 512 byte;
+b ) If the platform uses [NAND], the size of the struct corresponding to the new LID must be page size aligned (ie 4K or 2K).
+
+2. For customized pro_info, please refer to "Customization in NvRAM Product Info feature.pptx" Note_2
+:
+a) If the platform uses [eMMC], the size of the new LID in g_new_nvram_lid[] must be aligned with 128K;
+b) If the platform uses [NAND], the size of the new LID in g_new_nvram_lid[] must be aligned with blocksize (4K pagesize corresponds to 256K, 2K pagesize corresponds to 128K).
+
+3. The upper-level APK read and write sets the flag of factory mode closed, please refer to FAQ: FAQ04542
+
+4.Read the flag set by factory mode in lk.
+
+1) -in alps\mediatek\platform\mt6572\lk\factory.c factory_detection(), add an if judgment before factory_check_key_trigger(), read flag as 1, return false
+
+2) To obtain the factory mode flag, please refer to FAQ: FAQ09867
